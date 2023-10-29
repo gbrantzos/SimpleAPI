@@ -8,7 +8,9 @@ using SimpleAPI.Infrastructure.Persistence;
 
 namespace SimpleAPI.IntegrationTests.Setup;
 
-public class SimpleAPIFactory : WebApplicationFactory<Program>
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class SimpleAPIFactory : WebApplicationFactory<ISimpleAPI>
 {
     private readonly SqliteConnection _connection;
 
