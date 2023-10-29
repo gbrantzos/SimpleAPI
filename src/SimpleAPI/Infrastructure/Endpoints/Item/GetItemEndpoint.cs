@@ -12,7 +12,7 @@ public static class GetItemEndpoint
         var item = await itemRepository.GetByID(id, cancellationToken);
         if (item is null)
             return TypedResults.NotFound();
-        
+
         return TypedResults.Ok(item);
     }
 }

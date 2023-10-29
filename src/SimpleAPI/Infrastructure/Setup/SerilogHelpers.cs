@@ -1,4 +1,4 @@
-namespace SimpleAPI.Infrastructure;
+namespace SimpleAPI.Infrastructure.Setup;
 
 public static class SerilogHelpers
 {
