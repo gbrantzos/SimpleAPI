@@ -54,7 +54,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var response = await client.GetAsync("/items/123");
 
         // Assert
-        response.ShouldReturn(HttpStatusCode.NotFound);
+        response.ShouldReturn(HttpStatusCode.NotFound, "application/problem+json");
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var response = await client.GetAsync("/items/abc");
 
         // Assert
-        response.ShouldReturn(HttpStatusCode.NotFound);
+        response.ShouldReturn(HttpStatusCode.NotFound, "application/problem+json");
     }
 
     [Fact]
@@ -164,12 +164,12 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
                      "description": "Invalid item"
                    }
                    """;
-        
+
         // Act
         var response = await client.PostStringAsJsonAsync("/items", json);
 
         // Assert
-        response.ShouldReturn(HttpStatusCode.BadRequest);
+        response.ShouldReturn(HttpStatusCode.BadRequest, "application/problem+json");
     }
 
     [Fact]
@@ -208,6 +208,6 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var response = await client.DeleteAsync("/items/556");
 
         // Assert
-        response.ShouldReturn(HttpStatusCode.NotFound);
+        response.ShouldReturn(HttpStatusCode.NotFound, "application/problem+json");
     }
 }

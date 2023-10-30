@@ -1,13 +1,11 @@
-using SimpleAPI.Application;
-
 namespace SimpleAPI.Infrastructure.Setup;
 
 public class RequestContextMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ContextProvider<RequestContext> _contextProvider;
+    private readonly RequestContextProvider _contextProvider;
 
-    public RequestContextMiddleware(RequestDelegate next, ContextProvider<RequestContext> contextProvider)
+    public RequestContextMiddleware(RequestDelegate next,RequestContextProvider contextProvider)
     {
         _next            = next;
         _contextProvider = contextProvider;

@@ -1,14 +1,13 @@
 using Serilog.Core;
 using Serilog.Events;
-using SimpleAPI.Application;
 
 namespace SimpleAPI.Infrastructure.Setup;
 
 public class RequestContextEnricher : ILogEventEnricher
 {
-    private readonly ContextProvider<RequestContext> _contextProvider;
+    private readonly RequestContextProvider _contextProvider;
 
-    public RequestContextEnricher(ContextProvider<RequestContext> contextProvider)
+    public RequestContextEnricher(RequestContextProvider contextProvider)
     {
         _contextProvider = contextProvider;
     }

@@ -3,6 +3,7 @@ using SimpleAPI.Infrastructure;
 using SimpleAPI.Infrastructure.Endpoints;
 using SimpleAPI.Infrastructure.Persistence;
 using SimpleAPI.Infrastructure.Setup;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Host.UseSerilog((_, services, configuration) =>
 
 builder.Services
     .AddEndpointsApiExplorer()
+    .AddProblemDetails(options => options.CustomizeProblemDetails = ProblemDetailsHelpers.CustomizeProblemDetails)
     .AddSwaggerGen();
 
 builder.Services
@@ -26,12 +28,19 @@ builder.Services
 
 var app = builder.Build();
 app.UseRequestContext();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.DocExpansion(DocExpansion.List);
+        options.DefaultModelsExpandDepth(-1);
+    });
 }
 
 app.MapEndpoints();

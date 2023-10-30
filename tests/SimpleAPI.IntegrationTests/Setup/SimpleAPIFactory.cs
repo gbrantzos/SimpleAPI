@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
@@ -54,6 +55,12 @@ public class SimpleAPIFactory : WebApplicationFactory<ISimpleAPI>
                 logger.LogError(ex, "An error occurred while initializing test database: {Message}", ex.Message);
             }
         });
+    }
+    
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
     public SimpleAPIContext GetContext()
