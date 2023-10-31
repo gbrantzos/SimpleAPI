@@ -1,4 +1,4 @@
-using SimpleAPI.Domain.Items;
+using SimpleAPI.Domain.Features.Items;
 
 namespace SimpleAPI.Infrastructure.Persistence.Repositories;
 

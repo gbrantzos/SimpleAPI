@@ -1,4 +1,4 @@
-namespace SimpleAPI.Domain.Items;
+namespace SimpleAPI.Domain.Features.Items;
 
 public interface IItemRepository
 {

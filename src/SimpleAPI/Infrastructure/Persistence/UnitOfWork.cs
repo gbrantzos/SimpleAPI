@@ -1,4 +1,5 @@
 using SimpleAPI.Domain;
+using SimpleAPI.Domain.Core;
 
 namespace SimpleAPI.Infrastructure.Persistence;
 

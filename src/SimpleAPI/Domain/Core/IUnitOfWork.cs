@@ -1,4 +1,4 @@
-namespace SimpleAPI.Domain;
+namespace SimpleAPI.Domain.Core;
 
 public interface IUnitOfWork
 {

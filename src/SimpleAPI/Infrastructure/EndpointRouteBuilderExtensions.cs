@@ -1,6 +1,7 @@
 using System.Reflection;
+using SimpleAPI.Infrastructure.Endpoints;
 
-namespace SimpleAPI.Infrastructure.Endpoints;
+namespace SimpleAPI.Infrastructure;
 
 public static class EndpointRouteBuilderExtensions
 {

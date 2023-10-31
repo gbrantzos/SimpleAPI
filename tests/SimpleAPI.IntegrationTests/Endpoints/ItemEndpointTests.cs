@@ -1,6 +1,8 @@
 using System.Net;
+using System.Text.Json;
 using FluentAssertions;
-using SimpleAPI.Domain.Items;
+using Microsoft.AspNetCore.Mvc;
+using SimpleAPI.Domain.Features.Items;
 using SimpleAPI.IntegrationTests.Setup;
 
 namespace SimpleAPI.IntegrationTests.Endpoints;
@@ -151,7 +153,10 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var response = await client.PostStringAsJsonAsync("/items", json);
 
         // Assert
-        response.ShouldReturn(HttpStatusCode.NotFound);
+        response.ShouldReturn(HttpStatusCode.NotFound, "application/problem+json");
+        var content = await response.Content.ReadAsStringAsync();
+        var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(content);
+
     }
 
     [Fact]

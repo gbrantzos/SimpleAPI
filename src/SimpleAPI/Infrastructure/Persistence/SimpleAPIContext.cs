@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SimpleAPI.Domain.Items;
+using SimpleAPI.Domain.Features.Items;
 
 namespace SimpleAPI.Infrastructure.Persistence;
 

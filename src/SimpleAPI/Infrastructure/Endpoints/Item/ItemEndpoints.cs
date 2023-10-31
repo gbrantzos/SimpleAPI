@@ -1,6 +1,9 @@
+using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using SimpleAPI.Domain;
-using SimpleAPI.Domain.Items;
+using SimpleAPI.Domain.Core;
+using SimpleAPI.Domain.Features.Items;
 
 namespace SimpleAPI.Infrastructure.Endpoints.Item;
 
@@ -28,7 +31,7 @@ public class ItemEndpoints : IEndpointMapper
 
     private static class GetItem
     {
-        public static async Task<Results<Ok<Domain.Items.Item>, NotFound>> Handle(int id,
+        public static async Task<Results<Ok<Domain.Features.Items.Item>, NotFound>> Handle(int id,
             IItemRepository itemRepository,
             CancellationToken cancellationToken)
         {
@@ -42,7 +45,7 @@ public class ItemEndpoints : IEndpointMapper
 
     private static class SaveItem
     {
-        public static async Task<IResult> Handle(Domain.Items.Item item,
+        public static async Task<IResult> Handle(Domain.Features.Items.Item item,
             IItemRepository itemRepository,
             IUnitOfWork unitOfWork,
             HttpContext context,
@@ -60,7 +63,18 @@ public class ItemEndpoints : IEndpointMapper
             {
                 var existing = await itemRepository.GetByID(item.ID, cancellationToken);
                 if (existing is null)
-                    return Results.NotFound($"Entity not found, ID: {item.ID}");
+                    // return Results.NotFound($"Entity not found, ID: {item.ID}");
+                {
+                    var problem = new ProblemDetails
+                    {
+                        Type     = $"https://httpstatuses.io/{HttpStatusCode.NotFound}",
+                        Title    = "Item not found",
+                        Status   = (int)HttpStatusCode.NotFound,
+                        Detail   = $"Entity not found, ID: {item.ID}",
+                        Instance = context.Request.Path
+                    };
+                    return Results.Problem(problem);
+                }
 
                 existing.Code                     = item.Code;
                 existing.Description              = item.Description;

@@ -1,7 +1,5 @@
 using Serilog;
 using SimpleAPI.Infrastructure;
-using SimpleAPI.Infrastructure.Endpoints;
-using SimpleAPI.Infrastructure.Persistence;
 using SimpleAPI.Infrastructure.Setup;
 using Swashbuckle.AspNetCore.SwaggerUI;
 

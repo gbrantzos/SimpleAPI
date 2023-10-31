@@ -5,7 +5,7 @@ public class RequestContextMiddleware
     private readonly RequestDelegate _next;
     private readonly RequestContextProvider _contextProvider;
 
-    public RequestContextMiddleware(RequestDelegate next,RequestContextProvider contextProvider)
+    public RequestContextMiddleware(RequestDelegate next, RequestContextProvider contextProvider)
     {
         _next            = next;
         _contextProvider = contextProvider;
@@ -13,13 +13,9 @@ public class RequestContextMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        _contextProvider.CurrentContext = new RequestContext();
+        _contextProvider.CurrentContext = RequestContext.Create();
+        context.Response.Headers.Add("X-Request-StartedOn", _contextProvider.CurrentContext.StartedOn.ToLongDateString());
         await _next(context);
+        _contextProvider.CurrentContext = null;
     }
-}
-
-public static class RequestContextMiddlewareExtensions
-{
-    public static IApplicationBuilder UseRequestContext(this IApplicationBuilder builder)
-        => builder.UseMiddleware<RequestContextMiddleware>();
 }

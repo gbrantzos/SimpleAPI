@@ -1,5 +1,5 @@
 using FluentAssertions;
-using SimpleAPI.Domain.Items;
+using SimpleAPI.Domain.Features.Items;
 using SimpleAPI.Infrastructure.Persistence;
 using SimpleAPI.Infrastructure.Persistence.Repositories;
 using SimpleAPI.IntegrationTests.Setup;
