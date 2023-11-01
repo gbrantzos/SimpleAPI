@@ -6,14 +6,9 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 var builder = WebApplication.CreateBuilder(args);
 
 SerilogHelpers.SetLoggingPath();
-builder.Host.UseSerilog((_, services, configuration) =>
-{
-    var requestContextEnricher = services.GetRequiredService<RequestContextEnricher>();
-    configuration
-        .ReadFrom.Configuration(builder.Configuration)
-        .ReadFrom.Services(services)
-        .Enrich.With(requestContextEnricher);
-});
+builder.Host
+    .AddAutofac()
+    .AddSerilog(builder.Configuration);
 
 builder.Services
     .AddEndpointsApiExplorer()

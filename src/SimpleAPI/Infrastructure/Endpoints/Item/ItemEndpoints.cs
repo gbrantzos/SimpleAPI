@@ -1,7 +1,9 @@
 using System.Net;
+using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using SimpleAPI.Domain;
+using SimpleAPI.Application.Features.Items.UseCases.SaveItem;
+using SimpleAPI.Application.Features.Items.ViewModels;
 using SimpleAPI.Domain.Core;
 using SimpleAPI.Domain.Features.Items;
 
@@ -49,8 +51,16 @@ public class ItemEndpoints : IEndpointMapper
             IItemRepository itemRepository,
             IUnitOfWork unitOfWork,
             HttpContext context,
+            IMediator mediator,
             CancellationToken cancellationToken)
         {
+            var viewModel = new ItemViewModel()
+            {
+                Code        = "",
+                Description = ""
+            };
+            var result = await mediator.Send(new SaveItemCommand(0, viewModel), cancellationToken);
+            
             if (String.IsNullOrEmpty(item.Code))
                 return Results.BadRequest();
 

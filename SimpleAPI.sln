@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{0D84415B-C
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAPI.UnitTests", "tests\SimpleAPI.UnitTests\SimpleAPI.UnitTests.csproj", "{BE50F09C-D678-41BB-A9AE-A5469D7914D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,9 +30,14 @@ Global
 		{96FFE834-8BF4-488E-B5C8-BFC06B110CE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96FFE834-8BF4-488E-B5C8-BFC06B110CE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96FFE834-8BF4-488E-B5C8-BFC06B110CE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE50F09C-D678-41BB-A9AE-A5469D7914D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE50F09C-D678-41BB-A9AE-A5469D7914D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE50F09C-D678-41BB-A9AE-A5469D7914D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE50F09C-D678-41BB-A9AE-A5469D7914D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{93ECB565-0658-4375-A186-B47EACBECFAE} = {7DEE1FC8-AB58-42F8-8808-879A535774F8}
 		{96FFE834-8BF4-488E-B5C8-BFC06B110CE6} = {6E8D508E-1660-4966-A7B6-3E441B92C666}
+		{BE50F09C-D678-41BB-A9AE-A5469D7914D1} = {7DEE1FC8-AB58-42F8-8808-879A535774F8}
 	EndGlobalSection
 EndGlobal

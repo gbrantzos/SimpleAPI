@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="7.1.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="FluentValidation" Version="11.8.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.8.0" />
+    <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.12"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.12"/>
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
@@ -19,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Features\" />
+    <Folder Include="Application\Features\Items\UseCases\" />
   </ItemGroup>
 
 </Project>
