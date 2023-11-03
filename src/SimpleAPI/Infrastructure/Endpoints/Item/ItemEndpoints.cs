@@ -60,7 +60,6 @@ public class ItemEndpoints : IEndpointMapper
                 Description = ""
             };
             var result = await mediator.Send(new SaveItemCommand(0, viewModel), cancellationToken);
-            
             if (String.IsNullOrEmpty(item.Code))
                 return Results.BadRequest();
 
