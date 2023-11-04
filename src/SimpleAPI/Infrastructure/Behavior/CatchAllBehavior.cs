@@ -19,7 +19,7 @@ public class CatchAllBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest,
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unhandled exception. {@Request}", request);
+            _logger.LogWarning("[{RequestType}] Unhandled exception. {@Request}", typeof(TRequest).Name, request);
             throw;
         }
     }

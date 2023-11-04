@@ -10,6 +10,16 @@ namespace SimpleAPI.Infrastructure;
 
 public static class DependencyInjection
 {
+    public static IServiceCollection AddSystemServices(this IServiceCollection services)
+    {
+        services
+            .AddEndpointsApiExplorer()
+            .AddProblemDetails(options => options.CustomizeProblemDetails = ProblemDetailsHelpers.CustomizeProblemDetails)
+            .AddSwaggerGen();
+
+        return services;
+    }
+
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddSingleton<RequestContextProvider>();
@@ -23,11 +33,12 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssemblyContaining<ISimpleAPI>();
-        
+
+        services.AddPersistenceServices();
         return services;
     }
 
-    public static IServiceCollection AddPersistenceServices(this IServiceCollection services)
+    private static IServiceCollection AddPersistenceServices(this IServiceCollection services)
     {
         services.AddDbContext<SimpleAPIContext>();
         services.AddScoped<IItemRepository, ItemRepository>();

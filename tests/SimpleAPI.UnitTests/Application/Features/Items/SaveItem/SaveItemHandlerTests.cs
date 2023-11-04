@@ -21,7 +21,7 @@ public class SaveItemHandlerTests
             Code        = "Code",
             Description = "Valid Item"
         };
-        var request = new SaveItemCommand(0, viewModel);
+        var request = new SaveItemCommand(viewModel);
         var mockRepo = _mockRepository.Create<IItemRepository>();
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
@@ -43,6 +43,8 @@ public class SaveItemHandlerTests
             Code        = "Code",
             Description = "Valid Item"
         });
+        
+        _mockRepository.VerifyAll();
     }
 
     [Fact]
@@ -81,6 +83,8 @@ public class SaveItemHandlerTests
             Code        = "Code",
             Description = "Valid Item"
         }, opt => opt.Excluding(i => i.ID));
+        
+        _mockRepository.VerifyAll();
     }
 
     [Fact]
@@ -99,8 +103,6 @@ public class SaveItemHandlerTests
 
         mockRepo.Setup(m => m.GetByIDAsync(It.Is<int>(i => i == 4), cancellationToken))
             .ReturnsAsync((Item)null!);
-        mockUnitOfWork.Setup(m => m.SaveChangesAsync(cancellationToken))
-            .Returns(Task.CompletedTask);
 
         // Act
         var handler = new SaveItemHandler(mockRepo.Object, mockUnitOfWork.Object);
@@ -112,5 +114,7 @@ public class SaveItemHandlerTests
 
         var error = result.Error;
         error.Kind.Should().Be(ErrorKind.NotFound);
+        
+        _mockRepository.VerifyAll();
     }
 }
