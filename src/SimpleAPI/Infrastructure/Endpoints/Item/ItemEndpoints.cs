@@ -25,7 +25,10 @@ public class ItemEndpoints : IEndpointMapper
             .WithDescription("Retrieve an item by its ID.");
         group.MapPost("", SaveItem.Handle)
             .WithName("SaveItem")
-            .WithSummary("Save new or existing item");
+            .WithSummary("Save new item");
+        group.MapPut("{id:int}", UpdateItem.Handle)
+            .WithName("UpdateItem")
+            .WithSummary("Update existing item");
         group.MapDelete("{id:int}", DeleteItem.Handle)
             .WithName("DeleteItem")
             .WithSummary("Delete item by ID");
@@ -37,7 +40,7 @@ public class ItemEndpoints : IEndpointMapper
             IItemRepository itemRepository,
             CancellationToken cancellationToken)
         {
-            var item = await itemRepository.GetByID(id, cancellationToken);
+            var item = await itemRepository.GetByIDAsync(id, cancellationToken);
             if (item is null)
                 return TypedResults.NotFound();
 
@@ -47,54 +50,63 @@ public class ItemEndpoints : IEndpointMapper
 
     private static class SaveItem
     {
+        public static async Task<IResult> Handle(
+            ItemViewModel item,
+            IMediator mediator,
+            CancellationToken cancellationToken)
+        {
+            var response = await mediator.
+                Send(new SaveItemCommand(item), cancellationToken);
+            
+            // TODO Create mapping error => problem details
+            return response.Match(vm =>
+            {
+                var location = $"/items/{vm.ID}";
+                return Results.Created(location, vm);
+            }, error => Results.BadRequest());
+        }
+    }
+
+    private static class UpdateItem
+    {
         public static async Task<IResult> Handle(Domain.Features.Items.Item item,
+            [FromRoute(Name = "id")] int existingID,
             IItemRepository itemRepository,
             IUnitOfWork unitOfWork,
             HttpContext context,
             IMediator mediator,
             CancellationToken cancellationToken)
         {
-            var viewModel = new ItemViewModel()
-            {
-                Code        = "",
-                Description = ""
-            };
-            var result = await mediator.Send(new SaveItemCommand(0, viewModel), cancellationToken);
+            // var viewModel = new ItemViewModel()
+            // {
+            //     Code        = "",
+            //     Description = ""
+            // };
+            // var result = await mediator.Send(new SaveItemCommand(0, viewModel), cancellationToken);
             if (String.IsNullOrEmpty(item.Code))
                 return Results.BadRequest();
 
-            var isNew = item.ID == 0;
-            if (isNew)
+            var existing = await itemRepository.GetByIDAsync(existingID, cancellationToken);
+            if (existing is null)
+                // return Results.NotFound($"Entity not found, ID: {item.ID}");
             {
-                await itemRepository.Add(item, cancellationToken);
-            }
-            else
-            {
-                var existing = await itemRepository.GetByID(item.ID, cancellationToken);
-                if (existing is null)
-                    // return Results.NotFound($"Entity not found, ID: {item.ID}");
+                var problem = new ProblemDetails
                 {
-                    var problem = new ProblemDetails
-                    {
-                        Type     = $"https://httpstatuses.io/{HttpStatusCode.NotFound}",
-                        Title    = "Item not found",
-                        Status   = (int)HttpStatusCode.NotFound,
-                        Detail   = $"Entity not found, ID: {item.ID}",
-                        Instance = context.Request.Path
-                    };
-                    return Results.Problem(problem);
-                }
-
-                existing.Code                     = item.Code;
-                existing.Description              = item.Description;
-                context.Response.Headers.Location = $"/items/{item.ID}";
+                    Type     = $"https://httpstatuses.io/{HttpStatusCode.NotFound}",
+                    Title    = "Item not found",
+                    Status   = (int)HttpStatusCode.NotFound,
+                    Detail   = $"Entity not found, ID: {item.ID}",
+                    Instance = context.Request.Path
+                };
+                return Results.Problem(problem);
             }
-            await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var location = $"/items/{item.ID}";
-            return isNew
-                ? Results.Created(location, new { Result = "Item saved successfully" })
-                : Results.Ok(new { Result                = "Item saved successfully" });
+            existing.Code                     = item.Code;
+            existing.Description              = item.Description;
+            context.Response.Headers.Location = $"/items/{item.ID}";
+
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            return Results.Ok(existing.ToViewModel());
         }
     }
 
@@ -105,7 +117,7 @@ public class ItemEndpoints : IEndpointMapper
             IUnitOfWork unitOfWork,
             CancellationToken cancellationToken)
         {
-            var item = await itemRepository.GetByID(id, cancellationToken);
+            var item = await itemRepository.GetByIDAsync(id, cancellationToken);
             if (item is null)
                 return Results.NotFound();
 

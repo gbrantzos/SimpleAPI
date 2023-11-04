@@ -41,10 +41,4 @@ public static class AssertionExtensions
             Encoding.UTF8,
             "application/json")
         );
-
-    public static void ShouldHaveLocationHeader(this HttpResponseMessage response, string expected)
-    {
-        var actual = (response.Headers.Location?.ToString()) ?? String.Empty;
-        actual.Should().BeEquivalentTo(expected);
-    }
 }

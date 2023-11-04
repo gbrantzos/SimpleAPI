@@ -4,7 +4,7 @@ using SimpleAPI.Infrastructure.Persistence;
 using SimpleAPI.Infrastructure.Persistence.Repositories;
 using SimpleAPI.IntegrationTests.Setup;
 
-namespace SimpleAPI.IntegrationTests.Repositories;
+namespace SimpleAPI.IntegrationTests.Infrastructure.Persistence.Repositories;
 
 // Ideas found on
 // https://github.com/skimedic/SoftwareTesting
@@ -30,7 +30,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         await _database.Context.ExecuteAndRollbackAsync(async () =>
             {
                 // Act
-                await repository.Add(item);
+                await repository.AddAsync(item);
                 await uow.SaveChangesAsync();
 
                 // Assert
@@ -49,7 +49,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         var item = new Item
         {
-            Code        = "Test.001",
+            Code        = "Test.002",
             Description = "Testing item persistence"
         };
         _database.Context.Add(item);
@@ -59,7 +59,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
             // Act
-            var existing = await repository.GetByID(item.ID) ??
+            var existing = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException("Existing item is null");
             existing.Description = "This a changed description";
             await uow.SaveChangesAsync();
@@ -79,7 +79,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         var item = new Item
         {
-            Code        = "Test.001",
+            Code        = "Test.003",
             Description = "Testing item persistence"
         };
         _database.Context.Add(item);
@@ -134,7 +134,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             var expected = items.Last();
             
             // Act 
-            var actual = await repository.GetByID(expected.ID);
+            var actual = await repository.GetByIDAsync(expected.ID);
             
             // Assert
             actual.Should().NotBeNull();

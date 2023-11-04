@@ -2,10 +2,11 @@ using System.Net;
 using System.Text.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using SimpleAPI.Application.Features.Items.ViewModels;
 using SimpleAPI.Domain.Features.Items;
 using SimpleAPI.IntegrationTests.Setup;
 
-namespace SimpleAPI.IntegrationTests.Endpoints;
+namespace SimpleAPI.IntegrationTests.Infrastructure.Endpoints;
 
 public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
 {
@@ -18,7 +19,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
     }
 
     [Fact]
-    public async Task When_RetrievingByID_Then_EntityIsRetrievedAndResponseIsOK()
+    public async Task When_RequestByID_Then_EntityIsRetrievedAndResponseIsOK()
     {
         // Arrange
         var client = _apiFactory.CreateClient();
@@ -40,14 +41,14 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         response.Content.Should().NotBeNull();
         var content = await response.Content.ReadAsStringAsync();
 
-        var actual = content.FromJson<Item>();
-        var expected = json.FromJson<Item>();
+        var actual = content.FromJson<ItemViewModel>();
+        var expected = json.FromJson<ItemViewModel>();
         expected.ID = expectedID;
         actual.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task When_RetrievingByNonExistingID_Then_ResponseIsNotFound()
+    public async Task When_RequestByNonExistingID_Then_ResponseIsNotFound()
     {
         // Arrange
         var client = _apiFactory.CreateClient();
@@ -60,7 +61,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
     }
 
     [Fact]
-    public async Task When_RetrievingByMalFormed_Then_ResponseIsNotFound()
+    public async Task When_RequestByMalFormed_Then_ResponseIsNotFound()
     {
         // Arrange
         var client = _apiFactory.CreateClient();
@@ -73,14 +74,14 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
     }
 
     [Fact]
-    public async Task When_PostingNewItem_EntityIsSavedAndResponseIsCreated()
+    public async Task When_SendingNewItem_EntityIsSavedAndResponseIsCreated()
     {
         // Arrange
         var client = _apiFactory.CreateClient();
         var json = """
                    {
-                     "code": "123",
-                     "description": "Testing 123"
+                     "code": "156",
+                     "description": "Testing 156"
                    }
                    """;
 
@@ -88,19 +89,23 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var response = await client.PostStringAsJsonAsync("/items", json);
 
         // Assert
-        var dbContext = _apiFactory.GetContext();
-        var actual = dbContext.Items.SingleOrDefault(i => i.Code == "123");
         response.ShouldReturn(HttpStatusCode.Created);
+
+        var location = response.Headers.Location?.ToString();
+        location.Should().NotBeNull()
+            .And.MatchRegex("/items/([0-9])*");
+
+        var dbContext = _apiFactory.GetContext();
+        var actual = dbContext.Items.SingleOrDefault(i => i.Code == "156");
         actual.Should().NotBeNull();
-        response.ShouldHaveLocationHeader($"/items/{actual!.ID}");
 
         // Database assertion 
-        var expected = json.FromJson<Item>();
+        var expected = json.FromJson<ItemViewModel>();
         actual.Should().BeEquivalentTo(expected, opt => opt.Excluding(i => i.ID));
     }
 
     [Fact]
-    public async Task When_PostingExistingItem_Then_EntityIsSavedAndResponseIsCreated()
+    public async Task When_SendingExistingItem_Then_EntityIsSavedAndResponseIsCreated()
     {
         // Arrange
         var client = _apiFactory.CreateClient();
@@ -114,53 +119,52 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         await context.SaveChangesAsync();
         var existingID = existing.ID;
 
-        var json = $$"""
-                     {
-                       "id": {{existingID}},
-                       "code": "412",
-                       "description": "Changing item 412"
-                     }
-                     """;
+        var json = """
+                   {
+                     "code": "412",
+                     "description": "Changing item 412"
+                   }
+                   """;
 
         // Act
-        var response = await client.PostStringAsJsonAsync($"/items", json);
+        var response = await client.PutStringAsJsonAsync($"/items/{existingID}", json);
 
         // Assert
         response.ShouldReturn(HttpStatusCode.OK);
         response.Content.Should().NotBeNull();
-        response.ShouldHaveLocationHeader($"/items/{existingID}");
 
         // Database assertion 
         var dbContext = _apiFactory.GetContext();
         var actual = dbContext.Items.SingleOrDefault(i => i.Code == "412");
-        var expected = json.FromJson<Item>();
+        var expected = json.FromJson<ItemViewModel>();
+        expected.ID = existingID;
+        
         actual.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
-    public async Task When_PostingNonExistingItem_Then_ResponseIsNotFound()
+    public async Task When_SendingNonExistingItem_Then_ResponseIsNotFound()
     {
         // Arrange
         var client = _apiFactory.CreateClient();
         var json = """
                    {
-                     "id": 35,
                      "code": "412",
                      "description": "Changing item 412"
                    }
                    """;
         // Act
-        var response = await client.PostStringAsJsonAsync("/items", json);
+        var response = await client.PutStringAsJsonAsync("/items/35", json);
 
         // Assert
         response.ShouldReturn(HttpStatusCode.NotFound, "application/problem+json");
         var content = await response.Content.ReadAsStringAsync();
         var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(content);
-
+        // TODO Add assertions on problem details
     }
 
     [Fact]
-    public async Task When_PostingInvalidItem_Then_ResponseIsBadRequest()
+    public async Task When_SendingInvalidItem_Then_ResponseIsBadRequest()
     {
         // Arrange
         var client = _apiFactory.CreateClient();

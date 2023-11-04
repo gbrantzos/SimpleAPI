@@ -6,12 +6,11 @@ using SimpleAPI.Application.Features.Items.ViewModels;
 using SimpleAPI.Domain.Core;
 using SimpleAPI.Domain.Features.Items;
 
-
 namespace SimpleAPI.UnitTests.Application.Features.Items.SaveItem;
 
 public class SaveItemHandlerTests
 {
-    private readonly MockRepository _mockRepository = new MockRepository(MockBehavior.Strict);
+    private readonly MockRepository _mockRepository = new(MockBehavior.Strict);
 
     [Fact]
     public async Task When_RequestIsValidNewItem_ReturnsItemViewModel()
@@ -27,7 +26,7 @@ public class SaveItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
-        mockRepo.Setup(m => m.Add(It.Is<Item>(i => i.Code == "Code"), cancellationToken))
+        mockRepo.Setup(m => m.AddAsync(It.Is<Item>(i => i.Code == "Code"), cancellationToken))
             .Returns(Task.CompletedTask);
         mockUnitOfWork.Setup(m => m.SaveChangesAsync(cancellationToken))
             .Returns(Task.CompletedTask);
@@ -60,7 +59,7 @@ public class SaveItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
-        mockRepo.Setup(m => m.GetByID(It.Is<int>(i => i == 4), cancellationToken))
+        mockRepo.Setup(m => m.GetByIDAsync(It.Is<int>(i => i == 4), cancellationToken))
             .ReturnsAsync(new Item
             {
                 ID          = 4,
@@ -81,7 +80,7 @@ public class SaveItemHandlerTests
         {
             Code        = "Code",
             Description = "Valid Item"
-        });
+        }, opt => opt.Excluding(i => i.ID));
     }
 
     [Fact]
@@ -98,7 +97,7 @@ public class SaveItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
-        mockRepo.Setup(m => m.GetByID(It.Is<int>(i => i == 4), cancellationToken))
+        mockRepo.Setup(m => m.GetByIDAsync(It.Is<int>(i => i == 4), cancellationToken))
             .ReturnsAsync((Item)null!);
         mockUnitOfWork.Setup(m => m.SaveChangesAsync(cancellationToken))
             .Returns(Task.CompletedTask);
