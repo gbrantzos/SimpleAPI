@@ -40,6 +40,7 @@ public class ItemEndpoints : IEndpointMapper
             IItemRepository itemRepository,
             CancellationToken cancellationToken)
         {
+            // TODO Replace with MediatR
             var item = await itemRepository.GetByIDAsync(id, cancellationToken);
             if (item is null)
                 return TypedResults.NotFound();
@@ -77,6 +78,7 @@ public class ItemEndpoints : IEndpointMapper
             IMediator mediator,
             CancellationToken cancellationToken)
         {
+            // TODO Replace with MediatR
             // var viewModel = new ItemViewModel()
             // {
             //     Code        = "",
@@ -117,6 +119,7 @@ public class ItemEndpoints : IEndpointMapper
             IUnitOfWork unitOfWork,
             CancellationToken cancellationToken)
         {
+            // TODO Replace with MediatR
             var item = await itemRepository.GetByIDAsync(id, cancellationToken);
             if (item is null)
                 return Results.NotFound();
