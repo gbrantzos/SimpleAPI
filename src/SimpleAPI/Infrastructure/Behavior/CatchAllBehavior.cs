@@ -17,7 +17,7 @@ public class CatchAllBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest,
         {
             return await next();
         }
-        catch (Exception e)
+        catch
         {
             _logger.LogWarning("[{RequestType}] Unhandled exception. {@Request}", typeof(TRequest).Name, request);
             throw;

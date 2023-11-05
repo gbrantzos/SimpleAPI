@@ -1,19 +1,14 @@
 using SimpleAPI.Infrastructure;
-using SimpleAPI.Infrastructure.Setup;
-
-SerilogHelpers.SetLoggingPath();
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Host
-    .AddAutofac()
-    .AddSerilog(builder.Configuration);
+    .PrepareHost(builder.Configuration);
 builder.Services
     .AddSystemServices()
-    .AddApplicationServices();
+    .AddApplicationServices()
+    .AddInfrastructure();
 
 var app = builder.Build();
-
 app.ConfigurePipeline(app.Environment);
 app.MapEndpoints();
 

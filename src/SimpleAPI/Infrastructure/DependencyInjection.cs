@@ -14,7 +14,8 @@ public static class DependencyInjection
     {
         services
             .AddEndpointsApiExplorer()
-            .AddProblemDetails(options => options.CustomizeProblemDetails = ProblemDetailsHelpers.CustomizeProblemDetails)
+            .AddHttpContextAccessor()
+            .AddProblemDetails(options => options.CustomizeProblemDetails = ErrorMapper.CustomizeProblemDetails)
             .AddSwaggerGen();
 
         return services;
@@ -33,11 +34,18 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssemblyContaining<ISimpleAPI>();
-
-        services.AddPersistenceServices();
+        
         return services;
     }
 
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    {
+        services.AddTransient<ErrorMapper>();
+        services.AddPersistenceServices();
+
+        return services;
+    }
+    
     private static IServiceCollection AddPersistenceServices(this IServiceCollection services)
     {
         services.AddDbContext<SimpleAPIContext>();

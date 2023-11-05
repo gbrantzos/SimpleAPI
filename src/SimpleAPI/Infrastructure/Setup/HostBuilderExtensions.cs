@@ -1,28 +1,24 @@
 using Autofac.Extensions.DependencyInjection;
 using Serilog;
+using SimpleAPI.Infrastructure.Setup;
 
-namespace SimpleAPI.Infrastructure.Setup;
+namespace SimpleAPI.Infrastructure;
 
 public static class HostBuilderExtensions
 {
-    public static IHostBuilder AddAutofac(this IHostBuilder hostBuilder)
+    public static IHostBuilder PrepareHost(this IHostBuilder builder, IConfiguration configuration)
     {
-        hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-
-        return hostBuilder;
-    }
-
-    public static IHostBuilder AddSerilog(this IHostBuilder hostBuilder, IConfiguration configuration)
-    {
-        hostBuilder.UseSerilog((_, services, loggerConfig) =>
-        {
-            var requestContextEnricher = services.GetRequiredService<RequestContextEnricher>();
-            loggerConfig
-                .ReadFrom.Configuration(configuration)
-                .ReadFrom.Services(services)
-                .Enrich.With(requestContextEnricher);
-        });
-
-        return hostBuilder;
+        SerilogHelpers.SetLoggingPath();
+        
+        return builder
+            .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+            .UseSerilog((_, services, loggerConfig) =>
+            {
+                var requestContextEnricher = services.GetRequiredService<RequestContextEnricher>();
+                loggerConfig
+                    .ReadFrom.Configuration(configuration)
+                    .ReadFrom.Services(services)
+                    .Enrich.With(requestContextEnricher);
+            });
     }
 }

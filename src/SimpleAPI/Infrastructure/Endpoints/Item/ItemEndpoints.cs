@@ -1,11 +1,10 @@
-using System.Net;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using SimpleAPI.Application.Features.Items.UseCases.DeleteItem;
+using SimpleAPI.Application.Features.Items.UseCases.GetItem;
 using SimpleAPI.Application.Features.Items.UseCases.SaveItem;
 using SimpleAPI.Application.Features.Items.ViewModels;
-using SimpleAPI.Domain.Core;
-using SimpleAPI.Domain.Features.Items;
 
 namespace SimpleAPI.Infrastructure.Endpoints.Item;
 
@@ -36,16 +35,18 @@ public class ItemEndpoints : IEndpointMapper
 
     private static class GetItem
     {
-        public static async Task<Results<Ok<Domain.Features.Items.Item>, NotFound>> Handle(int id,
-            IItemRepository itemRepository,
+        public static async Task<Results<Ok<ItemViewModel>, ProblemHttpResult>> Handle(int id,
+            IMediator mediator,
+            ErrorMapper errorMapper,
             CancellationToken cancellationToken)
         {
-            // TODO Replace with MediatR
-            var item = await itemRepository.GetByIDAsync(id, cancellationToken);
-            if (item is null)
-                return TypedResults.NotFound();
+            var request = new GetItemCommand(id);
+            var response = await mediator.Send(request, cancellationToken);
 
-            return TypedResults.Ok(item);
+            return response.Match<Results<Ok<ItemViewModel>, ProblemHttpResult>>(
+                vm => TypedResults.Ok(vm),
+                error => TypedResults.Problem(errorMapper.MapToProblemDetails(error))
+            );
         }
     }
 
@@ -54,80 +55,49 @@ public class ItemEndpoints : IEndpointMapper
         public static async Task<IResult> Handle(
             ItemViewModel item,
             IMediator mediator,
+            ErrorMapper errorMapper,
             CancellationToken cancellationToken)
         {
-            var response = await mediator.
-                Send(new SaveItemCommand(item), cancellationToken);
-            
-            // TODO Create mapping error => problem details
+            var response = await mediator.Send(new SaveItemCommand(item), cancellationToken);
+
             return response.Match(vm =>
             {
                 var location = $"/items/{vm.ID}";
                 return Results.Created(location, vm);
-            }, error => Results.BadRequest());
+            }, error => Results.Problem(errorMapper.MapToProblemDetails(error)));
         }
     }
 
     private static class UpdateItem
     {
-        public static async Task<IResult> Handle(Domain.Features.Items.Item item,
+        public static async Task<IResult> Handle(ItemViewModel item,
             [FromRoute(Name = "id")] int existingID,
-            IItemRepository itemRepository,
-            IUnitOfWork unitOfWork,
-            HttpContext context,
             IMediator mediator,
+            ErrorMapper errorMapper,
             CancellationToken cancellationToken)
         {
-            // TODO Replace with MediatR
-            // var viewModel = new ItemViewModel()
-            // {
-            //     Code        = "",
-            //     Description = ""
-            // };
-            // var result = await mediator.Send(new SaveItemCommand(0, viewModel), cancellationToken);
-            if (String.IsNullOrEmpty(item.Code))
-                return Results.BadRequest();
+            var request = new SaveItemCommand(existingID, item);
+            var response = await mediator.Send(request, cancellationToken);
 
-            var existing = await itemRepository.GetByIDAsync(existingID, cancellationToken);
-            if (existing is null)
-                // return Results.NotFound($"Entity not found, ID: {item.ID}");
-            {
-                var problem = new ProblemDetails
-                {
-                    Type     = $"https://httpstatuses.io/{HttpStatusCode.NotFound}",
-                    Title    = "Item not found",
-                    Status   = (int)HttpStatusCode.NotFound,
-                    Detail   = $"Entity not found, ID: {item.ID}",
-                    Instance = context.Request.Path
-                };
-                return Results.Problem(problem);
-            }
-
-            existing.Code                     = item.Code;
-            existing.Description              = item.Description;
-            context.Response.Headers.Location = $"/items/{item.ID}";
-
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Results.Ok(existing.ToViewModel());
+            return response.Match(
+                Results.Ok,
+                error => Results.Problem(errorMapper.MapToProblemDetails(error)));
         }
     }
 
     private static class DeleteItem
     {
         public static async Task<IResult> Handle(int id,
-            IItemRepository itemRepository,
-            IUnitOfWork unitOfWork,
+            IMediator mediator,
+            ErrorMapper errorMapper,
             CancellationToken cancellationToken)
         {
-            // TODO Replace with MediatR
-            var item = await itemRepository.GetByIDAsync(id, cancellationToken);
-            if (item is null)
-                return Results.NotFound();
+            var response = await mediator.Send(new DeleteItemCommand(id), cancellationToken);
 
-            itemRepository.Delete(item);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return Results.NoContent();
+            return response.Match(_ =>
+                    Results.NoContent(),
+                error => Results.Problem(errorMapper.MapToProblemDetails(error))
+            );
         }
     }
 }

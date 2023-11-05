@@ -19,7 +19,7 @@ public sealed class Error
         Message = message;
         if (details is not null)
         {
-            Details = new Dictionary<string, object>(details);
+            Details = new Dictionary<string, object?>(details);
         }
     }
 
