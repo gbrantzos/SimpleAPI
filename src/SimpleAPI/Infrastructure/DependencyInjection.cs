@@ -29,7 +29,7 @@ public static class DependencyInjection
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssemblyContaining<ISimpleAPI>();
-            cfg.AddOpenBehavior(typeof(CatchAllBehavior<,>));
+            cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 
