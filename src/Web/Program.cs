@@ -10,10 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host
     .PrepareHost(builder.Configuration);
 builder.Services
-    .AddSystemServices()
+    .AddHostServices(environment)
     .AddApplicationServices()
-    .AddInfrastructureServices()
-    .AddHostServices(environment);
+    .AddInfrastructureServices();
 
 var app = builder.Build();
 app.ConfigurePipeline(app.Environment);

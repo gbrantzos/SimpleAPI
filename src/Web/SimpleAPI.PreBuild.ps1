@@ -1,5 +1,5 @@
 # Output file
-$OutFile = "Infrastructure\BuildInformation.txt"
+$OutFile = "HostSetup\BuildInformation.txt"
 
 # Git details
 $tags = (git tag --points-at HEAD)
