@@ -1,32 +1,18 @@
 using SimpleAPI.Infrastructure;
 
-Console.WriteLine(@"
-|      ______  __                       __                ______  _______  ______ 
-|     /      \|  \                     |  \              /      \|       \|      \
-|    |  ▓▓▓▓▓▓\\▓▓______ ____   ______ | ▓▓ ______      |  ▓▓▓▓▓▓\ ▓▓▓▓▓▓▓\\▓▓▓▓▓▓
-|    | ▓▓___\▓▓  \      \    \ /      \| ▓▓/      \     | ▓▓__| ▓▓ ▓▓__/ ▓▓ | ▓▓  
-|     \▓▓    \| ▓▓ ▓▓▓▓▓▓\▓▓▓▓\  ▓▓▓▓▓▓\ ▓▓  ▓▓▓▓▓▓\    | ▓▓    ▓▓ ▓▓    ▓▓ | ▓▓  
-|     _\▓▓▓▓▓▓\ ▓▓ ▓▓ | ▓▓ | ▓▓ ▓▓  | ▓▓ ▓▓ ▓▓    ▓▓    | ▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓  | ▓▓  
-|    |  \__| ▓▓ ▓▓ ▓▓ | ▓▓ | ▓▓ ▓▓__/ ▓▓ ▓▓ ▓▓▓▓▓▓▓▓    | ▓▓  | ▓▓ ▓▓      _| ▓▓_ 
-|     \▓▓    ▓▓ ▓▓ ▓▓ | ▓▓ | ▓▓ ▓▓    ▓▓ ▓▓\▓▓     \    | ▓▓  | ▓▓ ▓▓     |   ▓▓ \
-|      \▓▓▓▓▓▓ \▓▓\▓▓  \▓▓  \▓▓ ▓▓▓▓▓▓▓ \▓▓ \▓▓▓▓▓▓▓     \▓▓   \▓▓\▓▓      \▓▓▓▓▓▓
-|                             | ▓▓                                                
-|                             | ▓▓                                                
-|                              \▓▓                                                
-|
-|    SimpleAPI - version 0.1.0
-                              
-");
+var environment = SimpleAPIEnvironment.Current();
+environment.DisplayLogo();
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Host
     .PrepareHost(builder.Configuration);
 builder.Services
     .AddSystemServices()
-    .AddApplicationServices()
+    .AddApplicationServices(environment)
     .AddInfrastructure();
 
 var app = builder.Build();
 app.ConfigurePipeline(app.Environment);
-app.MapEndpoints();
+app.MapEndpoints(builder.Configuration);
 
 app.Run();

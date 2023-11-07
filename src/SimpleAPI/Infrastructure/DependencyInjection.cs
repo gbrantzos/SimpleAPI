@@ -21,8 +21,9 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IEnvironment environment)
     {
+        services.AddSingleton(environment);
         services.AddSingleton<RequestContextProvider>();
         services.AddSingleton<RequestContextEnricher>();
 
