@@ -1,4 +1,5 @@
 using System.Reflection;
+using Prometheus;
 using SimpleAPI.Web.Endpoints;
 using SimpleAPI.Web.HostSetup.Environment;
 
@@ -11,6 +12,7 @@ public static class EndpointRouteBuilderExtensions
     {
         builder.MapCommonEndpoints(configuration);
         builder.MapFeatureEndpoints();
+        builder.MapMetrics();
         
         return builder;
     }
@@ -32,7 +34,7 @@ public static class EndpointRouteBuilderExtensions
         routeBuilder.MapGet("/favicon.ico",
             async context =>
             {
-                var favIcon = environment.MainAssembly.GetManifestResourceStream("Web.Web.Logo.png") ??
+                var favIcon = environment.MainAssembly.GetManifestResourceStream("SimpleAPI.Web.SimpleAPI.Logo.png") ??
                     throw new InvalidOperationException("Could not read favicon.ico!");
                 var data = new byte[favIcon.Length];
                 _ = await favIcon.ReadAsync(data.AsMemory(0, data.Length));

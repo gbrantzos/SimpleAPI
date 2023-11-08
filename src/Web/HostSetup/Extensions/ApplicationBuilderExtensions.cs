@@ -1,3 +1,4 @@
+using Prometheus;
 using Serilog;
 using SimpleAPI.Web.HostSetup.Context;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -14,6 +15,7 @@ public static class ApplicationBuilderExtensions
         builder.UseExceptionHandler();
         builder.UseStatusCodePages();
         builder.UseSerilogRequestLogging();
+        builder.UseHttpMetrics();
 
         if (environment.IsDevelopment())
         {

@@ -7,14 +7,15 @@ using SimpleAPI.Core.Base;
 
 namespace SimpleAPI.Application.Common.Behavior;
 
-public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, Result<TResponse, Error>>
+    where TRequest : Request<TResponse>
 {
     private readonly ILogger _logger;
 
     public LoggingBehavior(ILoggerFactory loggerFactory)
         => _logger = loggerFactory.CreateLogger<LoggingBehavior<TRequest, TResponse>>();
 
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+    public async Task<Result<TResponse, Error>> Handle(TRequest request, RequestHandlerDelegate<Result<TResponse, Error>> next,
         CancellationToken cancellationToken)
     {
         var requestType = typeof(TRequest).Name;
