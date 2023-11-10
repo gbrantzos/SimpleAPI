@@ -49,6 +49,8 @@ public class DatabaseFixture : IAsyncLifetime
     {
         var options = new DbContextOptionsBuilder<SimpleAPIContext>()
             .UseMySql(ConnectionString, ServerVersion.AutoDetect(ConnectionString))
+            .EnableSensitiveDataLogging()
+            .EnableDetailedErrors()
             .Options;
         _context = new SimpleAPIContext(options);
         _context.Database.EnsureCreated();

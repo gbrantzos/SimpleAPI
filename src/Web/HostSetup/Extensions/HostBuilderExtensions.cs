@@ -21,8 +21,8 @@ public static class HostBuilderExtensions
                     .Enrich.With(requestContextEnricher);
             });
     }
-    
-    public static void SetLoggingPath(string path = "logs")
+
+    private static void SetLoggingPath(string path = "logs")
     {
         var basePath = AppDomain.CurrentDomain.BaseDirectory;
         var logPath = Path.Combine(basePath, path);

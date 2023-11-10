@@ -12,7 +12,7 @@ builder.Host
 builder.Services
     .AddHostServices(environment)
     .AddApplicationServices()
-    .AddInfrastructureServices();
+    .AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();
 app.ConfigurePipeline(app.Environment);

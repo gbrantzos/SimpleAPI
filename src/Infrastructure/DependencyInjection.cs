@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAPI.Application.Common;
 using SimpleAPI.Domain.Features.Items;
@@ -8,16 +10,21 @@ namespace SimpleAPI.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddPersistenceServices();
+        services.AddPersistenceServices(configuration);
 
         return services;
     }
 
-    private static IServiceCollection AddPersistenceServices(this IServiceCollection services)
+    private static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<SimpleAPIContext>();
+        var connectionString = configuration.GetConnectionString("SimpleAPI");
+        services.AddDbContext<SimpleAPIContext>(options => options
+            .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+            .EnableSensitiveDataLogging()
+            .EnableDetailedErrors());
+
         services.AddScoped<IItemRepository, ItemRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

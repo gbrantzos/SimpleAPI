@@ -8,4 +8,6 @@ public class SimpleAPIContext : DbContext
     public DbSet<Item> Items => Set<Item>();
 
     public SimpleAPIContext(DbContextOptions<SimpleAPIContext> options) : base(options) { }
+
+    public string GetDbSchema() => this.Database.GenerateCreateScript();
 }

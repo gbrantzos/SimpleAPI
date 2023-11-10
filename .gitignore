@@ -29,6 +29,7 @@ publish/
 
 # Visual Studio 2015
 .vs/
+launchSettings.json
 
 # Rider IDE
 .idea/

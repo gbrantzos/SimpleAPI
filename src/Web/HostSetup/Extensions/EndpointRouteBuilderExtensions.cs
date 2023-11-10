@@ -1,5 +1,6 @@
 using System.Reflection;
 using Prometheus;
+using SimpleAPI.Infrastructure.Persistence;
 using SimpleAPI.Web.Endpoints;
 using SimpleAPI.Web.HostSetup.Environment;
 
@@ -41,6 +42,14 @@ public static class EndpointRouteBuilderExtensions
                 context.Response.Headers.Add("Content-Type", "image/png");
                 await context.Response.Body.WriteAsync(data);
             });
+        
+        // Database schema
+        routeBuilder.MapGet("/db-schema", async context =>
+        {
+            var scope = context.RequestServices.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<SimpleAPIContext>();
+            await context.Response.WriteAsync(dbContext.GetDbSchema());
+        });
 
         return routeBuilder;
     }

@@ -14,6 +14,7 @@ public class CommonEndpointsTests : IClassFixture<SimpleAPIFactory>
     [InlineData("/favicon.ico")]
     [InlineData("/configuration")]
     [InlineData("/metrics")]
+    [InlineData("/db-schema")]
     public async Task When_CommonEndpointReached_ReturnsOK(string url)
     {
         // Arrange
