@@ -9,5 +9,11 @@ public class SimpleAPIContext : DbContext
 
     public SimpleAPIContext(DbContextOptions<SimpleAPIContext> options) : base(options) { }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SimpleAPIContext).Assembly);
+    }
+
     public string GetDbSchema() => this.Database.GenerateCreateScript();
 }
