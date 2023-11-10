@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SimpleAPI.Core.Base;
 using SimpleAPI.Web.ErrorMapping;
-using SimpleAPI.Web.HostSetup.Context;
+using SimpleAPI.Web.Setup.Context;
 
 namespace SimpleAPI.UnitTests.Web.ErrorMapping;
 

@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-namespace SimpleAPI.Web.HostSetup.Environment;
+namespace SimpleAPI.Web.Setup.Environment;
 
 public class SimpleAPIEnvironment : IEnvironment
 {

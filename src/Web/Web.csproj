@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="HostSetup\BuildInformation.txt" />
+    <EmbeddedResource Include="Setup\BuildInformation.txt" />
     <EmbeddedResource Include="SimpleAPI.Logo.png"/>
   </ItemGroup>
 

@@ -1,9 +1,9 @@
 using Prometheus;
 using Serilog;
-using SimpleAPI.Web.HostSetup.Context;
+using SimpleAPI.Web.Setup.Context;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-namespace SimpleAPI.Web.HostSetup;
+namespace SimpleAPI.Web.Setup;
 
 public static class ApplicationBuilderExtensions
 {

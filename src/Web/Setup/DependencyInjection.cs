@@ -1,8 +1,8 @@
 using SimpleAPI.Web.ErrorMapping;
-using SimpleAPI.Web.HostSetup.Context;
-using SimpleAPI.Web.HostSetup.Environment;
+using SimpleAPI.Web.Setup.Context;
+using SimpleAPI.Web.Setup.Environment;
 
-namespace SimpleAPI.Web.HostSetup;
+namespace SimpleAPI.Web.Setup;
 
 public static class DependencyInjection
 {

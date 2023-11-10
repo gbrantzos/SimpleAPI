@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SimpleAPI.Infrastructure.Persistence;
+using SimpleAPI.Web;
 
 namespace SimpleAPI.IntegrationTests.Setup;
 

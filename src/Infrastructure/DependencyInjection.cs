@@ -10,12 +10,8 @@ namespace SimpleAPI.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddPersistenceServices(configuration);
-
-        return services;
-    }
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration) 
+        => services.AddPersistenceServices(configuration);
 
     private static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {

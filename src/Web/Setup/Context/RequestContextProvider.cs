@@ -1,5 +1,5 @@
 using SimpleAPI.Application.Common;
 
-namespace SimpleAPI.Web.HostSetup.Context;
+namespace SimpleAPI.Web.Setup.Context;
 
 public class RequestContextProvider : ContextProvider<RequestContext> { }

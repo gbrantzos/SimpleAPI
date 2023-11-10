@@ -2,9 +2,9 @@ using System.Reflection;
 using Prometheus;
 using SimpleAPI.Infrastructure.Persistence;
 using SimpleAPI.Web.Endpoints;
-using SimpleAPI.Web.HostSetup.Environment;
+using SimpleAPI.Web.Setup.Environment;
 
-namespace SimpleAPI.Web.HostSetup;
+namespace SimpleAPI.Web.Setup;
 
 public static class EndpointRouteBuilderExtensions
 {

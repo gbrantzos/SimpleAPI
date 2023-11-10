@@ -1,8 +1,8 @@
 using Autofac.Extensions.DependencyInjection;
 using Serilog;
-using SimpleAPI.Web.HostSetup.Context;
+using SimpleAPI.Web.Setup.Context;
 
-namespace SimpleAPI.Web.HostSetup;
+namespace SimpleAPI.Web.Setup;
 
 public static class HostBuilderExtensions
 {

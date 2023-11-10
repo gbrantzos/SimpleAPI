@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAPI.Core.Base;
-using SimpleAPI.Web.HostSetup.Context;
+using SimpleAPI.Web.Setup.Context;
 
 namespace SimpleAPI.Web.ErrorMapping;
 

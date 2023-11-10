@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 
-namespace SimpleAPI.Web.HostSetup;
+namespace SimpleAPI.Web.Setup;
 
 public class BuildInformation
 {

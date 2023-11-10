@@ -1,4 +1,4 @@
-namespace SimpleAPI.Web.HostSetup.Context;
+namespace SimpleAPI.Web.Setup.Context;
 
 public class RequestContextMiddleware
 {

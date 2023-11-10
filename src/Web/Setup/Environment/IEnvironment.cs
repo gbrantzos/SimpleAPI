@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace SimpleAPI.Web.HostSetup.Environment;
+namespace SimpleAPI.Web.Setup.Environment;
 
 public interface IEnvironment
 {

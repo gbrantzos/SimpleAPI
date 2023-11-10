@@ -1,7 +1,7 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace SimpleAPI.Web.HostSetup.Context;
+namespace SimpleAPI.Web.Setup.Context;
 
 public class RequestContextEnricher : ILogEventEnricher
 {
