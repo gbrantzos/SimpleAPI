@@ -15,6 +15,7 @@ public static class ItemViewModelExtensions
         => new()
         {
             ID          = item.ID,
+            RowVersion  = item.RowVersion,
             Code        = item.Code,
             Description = item.Description
         };

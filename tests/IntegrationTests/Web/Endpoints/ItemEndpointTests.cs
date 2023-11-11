@@ -25,6 +25,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var client = _apiFactory.CreateClient();
         var json = """
                    {
+                     "rowVersion": 1,
                      "code": "123",
                      "description": "Testing 123"
                    }
@@ -80,6 +81,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var client = _apiFactory.CreateClient();
         var json = """
                    {
+                     "rowVersion": 1,
                      "code": "156",
                      "description": "Testing 156"
                    }
@@ -137,7 +139,8 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var dbContext = _apiFactory.GetContext();
         var actual = dbContext.Items.SingleOrDefault(i => i.Code == "412");
         var expected = json.FromJson<ItemViewModel>();
-        expected.ID = existingID;
+        expected.ID         = existingID;
+        expected.RowVersion = existing.RowVersion + 1;
         
         actual.Should().BeEquivalentTo(expected);
     }

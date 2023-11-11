@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleAPI.Application.Common;
 using SimpleAPI.Application.Common.Behavior;
 
 namespace SimpleAPI.Application;
@@ -19,6 +20,7 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(thisAssembly);
+        services.AddSingleton<ITimeProvider, SystemTimeProvider>();
 
         return services;
     }

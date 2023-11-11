@@ -5,6 +5,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SimpleAPI.Application.Common;
 using SimpleAPI.Infrastructure.Persistence;
 using SimpleAPI.Web;
 
@@ -70,7 +71,7 @@ public class SimpleAPIFactory : WebApplicationFactory<Program>
             .UseSqlite(_connection)
             .Options;
 
-        return new SimpleAPIContext(options);
+        return new SimpleAPIContext(options, new SystemTimeProvider());
     }
 
     protected override void Dispose(bool disposing)

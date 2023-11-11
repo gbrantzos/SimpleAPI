@@ -18,6 +18,7 @@ public class SaveItemHandlerTests
         // Arrange
         var viewModel = new ItemViewModel
         {
+            RowVersion  = 1,
             Code        = "Code",
             Description = "Valid Item"
         };
@@ -42,7 +43,7 @@ public class SaveItemHandlerTests
         {
             Code        = "Code",
             Description = "Valid Item"
-        });
+        }, opt => opt.Excluding(i => i.RowVersion));
         
         _mockRepository.VerifyAll();
     }
@@ -61,13 +62,15 @@ public class SaveItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
+        var existingItem = new Item
+        {
+            ID          = 4,
+            RowVersion  = 1,
+            Code        = "Code",
+            Description = "Valid item"
+        };
         mockRepo.Setup(m => m.GetByIDAsync(It.Is<int>(i => i == 4), cancellationToken))
-            .ReturnsAsync(new Item
-            {
-                ID          = 4,
-                Code        = "Code",
-                Description = "Valid item"
-            });
+            .ReturnsAsync(existingItem);
         mockUnitOfWork.Setup(m => m.SaveChangesAsync(cancellationToken))
             .Returns(Task.CompletedTask);
 
@@ -80,9 +83,11 @@ public class SaveItemHandlerTests
         result.HasErrors.Should().BeFalse();
         result.Data.Should().BeEquivalentTo(new ItemViewModel()
         {
+            ID          = 4,
+            RowVersion  = 1,
             Code        = "Code",
             Description = "Valid Item"
-        }, opt => opt.Excluding(i => i.ID));
+        });
         
         _mockRepository.VerifyAll();
     }

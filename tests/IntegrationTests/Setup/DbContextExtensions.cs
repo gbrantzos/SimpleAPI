@@ -12,6 +12,7 @@ public static class DbContextExtensions
             using var trans = context.Database.BeginTransaction();
             executable();
             trans.Rollback();
+            context.ChangeTracker.Clear();
         });
     }
 
@@ -23,6 +24,7 @@ public static class DbContextExtensions
             await using var trans = await context.Database.BeginTransactionAsync();
             await executable();
             await trans.RollbackAsync();
+            context.ChangeTracker.Clear();
         });
     }
 }

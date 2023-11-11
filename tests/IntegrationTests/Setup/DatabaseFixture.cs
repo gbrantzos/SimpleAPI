@@ -2,6 +2,8 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Moq;
+using SimpleAPI.Application.Common;
 using SimpleAPI.Infrastructure.Persistence;
 using Testcontainers.MySql;
 
@@ -10,6 +12,7 @@ namespace SimpleAPI.IntegrationTests.Setup;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class DatabaseFixture : IAsyncLifetime
 {
+    private readonly Mock<ITimeProvider> _timeProviderMock = new Mock<ITimeProvider>();
     private readonly IContainer? _container;
     private SimpleAPIContext? _context;
     private string? _connectionString;
@@ -19,6 +22,8 @@ public class DatabaseFixture : IAsyncLifetime
 
     public string ConnectionString => _connectionString ??
         throw new InvalidOperationException($"{nameof(DatabaseFixture)} not initialized");
+
+    public Mock<ITimeProvider> TimeProviderMock => _timeProviderMock;
 
     public DatabaseFixture()
     {
@@ -52,7 +57,7 @@ public class DatabaseFixture : IAsyncLifetime
             .EnableSensitiveDataLogging()
             .EnableDetailedErrors()
             .Options;
-        _context = new SimpleAPIContext(options);
+        _context = new SimpleAPIContext(options, _timeProviderMock.Object);
         _context.Database.EnsureCreated();
     }
 
@@ -62,7 +67,7 @@ public class DatabaseFixture : IAsyncLifetime
         {
             await _container.StartAsync();
             var port = _container.GetMappedPublicPort(MySqlBuilder.MySqlPort);
-            _connectionString = $"server=localhost;user=root;password=secret;database=SimpleAPI;port={port}";
+            _connectionString = $"server=localhost;user=root;password=secret;database=simple_api_tests;port={port}";
         }
         PrepareContext();
     }
