@@ -80,6 +80,14 @@ public class ErrorMapperTests
                 Status = 400,
                 Detail = "Validation failed"
             });
+            
+            Add(Error.Create(ErrorKind.ModifiedEntry, "Entry modified"), new ProblemDetails()
+            {
+                Type   = "https://httpstatuses.io/409",
+                Title  = "Entry modified",
+                Status = 409,
+                Detail = "Entry modified"
+            });
         }
     }
 }

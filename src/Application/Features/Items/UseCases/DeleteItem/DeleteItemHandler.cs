@@ -21,6 +21,8 @@ public class DeleteItemHandler : Handler<DeleteItemCommand, bool>
         var existing = await _repository.GetByIDAsync(request.ID, cancellationToken);
         if (existing is null)
             return Error.Create(ErrorKind.NotFound, $"Entity with ID {request.ID} not found");
+        if (existing.RowVersion != request.RowVersion)
+            return Error.Create(ErrorKind.ModifiedEntry, $"Entity already modified");
         
         _repository.Delete(existing);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

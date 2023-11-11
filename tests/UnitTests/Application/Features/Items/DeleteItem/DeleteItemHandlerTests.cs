@@ -15,7 +15,7 @@ public class DeleteItemHandlerTests
     public async Task When_RequestedItemExists_EntityIsDeleted()
     {
         // Arrange
-        var request = new DeleteItemCommand(12);
+        var request = new DeleteItemCommand(12, 7);
         var mockRepo = _mockRepository.Create<IItemRepository>();
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
@@ -23,6 +23,7 @@ public class DeleteItemHandlerTests
         var existing = new Item()
         {
             ID          = 12,
+            RowVersion  = 7,
             Code        = "Test.123",
             Description = "Testing Item"
         };
@@ -46,7 +47,7 @@ public class DeleteItemHandlerTests
     public async Task When_RequestedItemDoesExists_ReturnsError()
     {
         // Arrange
-        var request = new DeleteItemCommand(12);
+        var request = new DeleteItemCommand(12, 8);
         var mockRepo = _mockRepository.Create<IItemRepository>();
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
@@ -64,6 +65,36 @@ public class DeleteItemHandlerTests
 
         var error = result.Error;
         error.Kind.Should().Be(ErrorKind.NotFound);
+
+        _mockRepository.VerifyAll();
+    }
+
+    [Fact]
+    public async Task When_RequestedDifferentRowVersion_ReturnsError()
+    {
+        // Arrange
+        var request = new DeleteItemCommand(12, 8);
+        var mockRepo = _mockRepository.Create<IItemRepository>();
+        var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
+        var cancellationToken = CancellationToken.None;
+
+        var existingItem = new Item()
+        {
+            RowVersion = 4
+        };
+        mockRepo.Setup(m => m.GetByIDAsync(12, cancellationToken))
+            .ReturnsAsync(existingItem);
+
+        // Act
+        var handler = new DeleteItemHandler(mockRepo.Object, mockUnitOfWork.Object);
+        var result = await handler.Handle(request, cancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.HasErrors.Should().BeTrue();
+
+        var error = result.Error;
+        error.Kind.Should().Be(ErrorKind.ModifiedEntry);
 
         _mockRepository.VerifyAll();
     }

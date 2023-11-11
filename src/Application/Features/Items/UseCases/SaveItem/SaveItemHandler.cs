@@ -27,6 +27,10 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
         {
             return Error.Create(ErrorKind.NotFound, $"Entity not found, ID: {request.ItemID}");
         }
+        if (!isNew && item.RowVersion != request.ViewModel.RowVersion)
+        {
+            return Error.Create(ErrorKind.ModifiedEntry, $"Entity already modified");
+        }
 
         item.Code        = request.ViewModel.Code;
         item.Description = request.ViewModel.Description;

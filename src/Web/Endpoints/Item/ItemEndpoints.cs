@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using SimpleAPI.Application.Features.Items.UseCases.DeleteItem;
 using SimpleAPI.Application.Features.Items.UseCases.GetItem;
 using SimpleAPI.Application.Features.Items.UseCases.SaveItem;
@@ -29,9 +30,10 @@ public class ItemEndpoints : IEndpointMapper
         group.MapPut("{id:int}", UpdateItem.Handle)
             .WithName("UpdateItem")
             .WithSummary("Update existing item");
-        group.MapDelete("{id:int}", DeleteItem.Handle)
+        group.MapDelete("{id:int}/{rowVersion:int}", DeleteItem.Handle)
             .WithName("DeleteItem")
             .WithSummary("Delete item by ID");
+
     }
 
     private static class GetItem
@@ -89,11 +91,12 @@ public class ItemEndpoints : IEndpointMapper
     private static class DeleteItem
     {
         public static async Task<IResult> Handle(int id,
+            int rowVersion,
             IMediator mediator,
             ErrorMapper errorMapper,
             CancellationToken cancellationToken)
         {
-            var response = await mediator.Send(new DeleteItemCommand(id), cancellationToken);
+            var response = await mediator.Send(new DeleteItemCommand(id, rowVersion), cancellationToken);
 
             return response.Match(_ =>
                     Results.NoContent(),

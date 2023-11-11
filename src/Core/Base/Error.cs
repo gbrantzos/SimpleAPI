@@ -4,7 +4,8 @@ public enum ErrorKind
 {
     Generic,
     NotFound,
-    ValidationFailed
+    ValidationFailed,
+    ModifiedEntry
 }
 
 public sealed class Error

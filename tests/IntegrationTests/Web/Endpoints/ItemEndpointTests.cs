@@ -25,7 +25,6 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var client = _apiFactory.CreateClient();
         var json = """
                    {
-                     "rowVersion": 1,
                      "code": "123",
                      "description": "Testing 123"
                    }
@@ -33,6 +32,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var saveResponse = await client.PostStringAsJsonAsync("/items", json);
         var location = saveResponse.Headers.Location;
         var expectedID = Convert.ToInt32(location!.ToString().Split('/').Last());
+        var expectedRowVersion = 1;
 
         // Act
         var response = await client.GetAsync(location);
@@ -44,7 +44,8 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
 
         var actual = content.FromJson<ItemViewModel>();
         var expected = json.FromJson<ItemViewModel>();
-        expected.ID = expectedID;
+        expected.ID         = expectedID;
+        expected.RowVersion = expectedRowVersion;
         actual.Should().BeEquivalentTo(expected);
     }
 
@@ -81,7 +82,6 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var client = _apiFactory.CreateClient();
         var json = """
                    {
-                     "rowVersion": 1,
                      "code": "156",
                      "description": "Testing 156"
                    }
@@ -103,6 +103,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
 
         // Database assertion 
         var expected = json.FromJson<ItemViewModel>();
+        expected.RowVersion = 1; // A newly created entity SHOULD have reo version 1 
         actual.Should().BeEquivalentTo(expected, opt => opt.Excluding(i => i.ID));
     }
 
@@ -123,6 +124,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
 
         var json = """
                    {
+                     "rowVersion": 1,
                      "code": "412",
                      "description": "Changing item 412"
                    }
@@ -139,9 +141,9 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var dbContext = _apiFactory.GetContext();
         var actual = dbContext.Items.SingleOrDefault(i => i.Code == "412");
         var expected = json.FromJson<ItemViewModel>();
-        expected.ID         = existingID;
-        expected.RowVersion = existing.RowVersion + 1;
-        
+        expected.ID = existingID;
+        expected.RowVersion++;
+
         actual.Should().BeEquivalentTo(expected);
     }
 
@@ -164,6 +166,37 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var content = await response.Content.ReadAsStringAsync();
         var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(content);
         // TODO Add assertions on problem details
+    }
+
+    [Fact]
+    public async Task When_SendingDifferentRowVersion_ResponseIsConflict()
+    {
+        // Arrange
+        var client = _apiFactory.CreateClient();
+        var existing = new Item
+        {
+            Code        = "412",
+            Description = "Existing item"
+        };
+        var context = _apiFactory.GetContext();
+        context.Add(existing);
+        await context.SaveChangesAsync();
+        var existingID = existing.ID;
+
+        var json = """
+                   {
+                     "rowVersion": 12,
+                     "code": "412",
+                     "description": "Changing item 412"
+                   }
+                   """;
+
+        // Act
+        var response = await client.PutStringAsJsonAsync($"/items/{existingID}", json);
+
+        // Assert
+        response.ShouldReturn(HttpStatusCode.Conflict, "application/problem+json");
+        response.Content.Should().NotBeNull();
     }
 
     [Fact]
@@ -200,7 +233,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var idToDelete = item.ID;
 
         // Act
-        var response = await client.DeleteAsync($"/items/{idToDelete}");
+        var response = await client.DeleteAsync($"/items/{idToDelete}/1");
 
         // Assert
         response.ShouldReturn(HttpStatusCode.NoContent);
@@ -217,9 +250,31 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var client = _apiFactory.CreateClient();
 
         // Act
-        var response = await client.DeleteAsync("/items/556");
+        var response = await client.DeleteAsync("/items/556/7");
 
         // Assert
         response.ShouldReturn(HttpStatusCode.NotFound, "application/problem+json");
+    }
+
+    [Fact]
+    public async Task When_DeletingDifferentRowVersion_Then_ResponseIsConflict()
+    {
+        // Arrange
+        var client = _apiFactory.CreateClient();
+        var item = new Item
+        {
+            Code        = "TOD_RV",
+            Description = "To delete"
+        };
+        var context = _apiFactory.GetContext();
+        context.Add(item);
+        await context.SaveChangesAsync();
+        var idToDelete = item.ID;
+
+        // Act
+        var response = await client.DeleteAsync($"/items/{idToDelete}/3");
+
+        // Assert
+        response.ShouldReturn(HttpStatusCode.Conflict, "application/problem+json");
     }
 }

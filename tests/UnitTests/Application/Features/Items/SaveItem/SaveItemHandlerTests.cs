@@ -54,6 +54,7 @@ public class SaveItemHandlerTests
         // Arrange
         var viewModel = new ItemViewModel
         {
+            RowVersion  = 3,
             Code        = "Code",
             Description = "Valid Item"
         };
@@ -65,7 +66,7 @@ public class SaveItemHandlerTests
         var existingItem = new Item
         {
             ID          = 4,
-            RowVersion  = 1,
+            RowVersion  = 3,
             Code        = "Code",
             Description = "Valid item"
         };
@@ -84,10 +85,9 @@ public class SaveItemHandlerTests
         result.Data.Should().BeEquivalentTo(new ItemViewModel()
         {
             ID          = 4,
-            RowVersion  = 1,
             Code        = "Code",
             Description = "Valid Item"
-        });
+        }, opt => opt.Excluding(i => i.RowVersion));
         
         _mockRepository.VerifyAll();
     }
@@ -119,6 +119,42 @@ public class SaveItemHandlerTests
 
         var error = result.Error;
         error.Kind.Should().Be(ErrorKind.NotFound);
+        
+        _mockRepository.VerifyAll();
+    }
+
+    [Fact]
+    public async Task When_RequestRowVersionIsDifferent_ReturnsError()
+    {
+        // Arrange
+        var viewModel = new ItemViewModel
+        {
+            RowVersion  = 3,
+            Code        = "Code",
+            Description = "Valid Item"
+        };
+        var request = new SaveItemCommand(14, viewModel);
+        var mockRepo = _mockRepository.Create<IItemRepository>();
+        var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
+        var cancellationToken = CancellationToken.None;
+
+        var existing = new Item()
+        {
+            RowVersion = 5
+        };
+        mockRepo.Setup(m => m.GetByIDAsync(It.Is<int>(i => i == 14), cancellationToken))
+            .ReturnsAsync(existing);
+
+        // Act
+        var handler = new SaveItemHandler(mockRepo.Object, mockUnitOfWork.Object);
+        var result = await handler.Handle(request, cancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.HasErrors.Should().BeTrue();
+
+        var error = result.Error;
+        error.Kind.Should().Be(ErrorKind.ModifiedEntry);
         
         _mockRepository.VerifyAll();
     }

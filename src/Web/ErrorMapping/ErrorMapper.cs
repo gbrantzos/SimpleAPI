@@ -46,6 +46,7 @@ public class ErrorMapper
             ErrorKind.Generic => "Generic error",
             ErrorKind.NotFound => "Not found",
             ErrorKind.ValidationFailed => "Bad request",
+            ErrorKind.ModifiedEntry => "Entry modified",
             _ => throw new ArgumentOutOfRangeException(nameof(errorKind), errorKind, null)
         };
     }
@@ -57,6 +58,7 @@ public class ErrorMapper
             ErrorKind.Generic => HttpStatusCode.InternalServerError,
             ErrorKind.NotFound => HttpStatusCode.NotFound,
             ErrorKind.ValidationFailed => HttpStatusCode.BadRequest,
+            ErrorKind.ModifiedEntry => HttpStatusCode.Conflict,
             _ => throw new ArgumentOutOfRangeException(nameof(errorKind), errorKind, null)
         };
     }
