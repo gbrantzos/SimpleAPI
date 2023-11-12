@@ -27,8 +27,7 @@ public class SaveItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
-        mockRepo.Setup(m => m.AddAsync(It.Is<Item>(i => i.Code == "Code"), cancellationToken))
-            .Returns(Task.CompletedTask);
+        mockRepo.Setup(m => m.Add(It.Is<Item>(i => i.Code == "Code")));
         mockUnitOfWork.Setup(m => m.SaveChangesAsync(cancellationToken))
             .Returns(Task.CompletedTask);
 

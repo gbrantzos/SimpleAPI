@@ -11,9 +11,9 @@ public class ItemRepository : IItemRepository
         _context = context;
     }
 
-    public async Task AddAsync(Item item, CancellationToken cancellationToken = default)
+    public void Add(Item item)
     {
-        await _context.Items.AddAsync(item, cancellationToken);
+        _context.Items.Add(item);
     }
 
     public async Task<Item?> GetByIDAsync(int id, CancellationToken cancellationToken = default)

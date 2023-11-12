@@ -112,16 +112,14 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
     {
         // Arrange
         var client = _apiFactory.CreateClient();
-        var existing = new Item
+        var context = _apiFactory.GetContext();
+        var existingID = await context.PersistEntityAsync(new Item
         {
             Code        = "412",
             Description = "Existing item"
-        };
-        var context = _apiFactory.GetContext();
-        context.Add(existing);
-        await context.SaveChangesAsync();
-        var existingID = existing.ID;
+        });
 
+        // Act
         var json = """
                    {
                      "rowVersion": 1,
@@ -129,8 +127,6 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
                      "description": "Changing item 412"
                    }
                    """;
-
-        // Act
         var response = await client.PutStringAsJsonAsync($"/items/{existingID}", json);
 
         // Assert
@@ -173,16 +169,14 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
     {
         // Arrange
         var client = _apiFactory.CreateClient();
-        var existing = new Item
+        var context = _apiFactory.GetContext();
+        var existingID = await context.PersistEntityAsync(new Item
         {
             Code        = "412",
             Description = "Existing item"
-        };
-        var context = _apiFactory.GetContext();
-        context.Add(existing);
-        await context.SaveChangesAsync();
-        var existingID = existing.ID;
+        });
 
+        // Act
         var json = """
                    {
                      "rowVersion": 12,
@@ -190,8 +184,6 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
                      "description": "Changing item 412"
                    }
                    """;
-
-        // Act
         var response = await client.PutStringAsJsonAsync($"/items/{existingID}", json);
 
         // Assert
@@ -222,15 +214,12 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
     {
         // Arrange
         var client = _apiFactory.CreateClient();
-        var item = new Item
+        var context = _apiFactory.GetContext();
+        var idToDelete = await context.PersistEntityAsync(new Item
         {
             Code        = "TOD",
             Description = "To delete"
-        };
-        var context = _apiFactory.GetContext();
-        context.Add(item);
-        await context.SaveChangesAsync();
-        var idToDelete = item.ID;
+        });
 
         // Act
         var response = await client.DeleteAsync($"/items/{idToDelete}/1");
@@ -261,15 +250,12 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
     {
         // Arrange
         var client = _apiFactory.CreateClient();
-        var item = new Item
+        var context = _apiFactory.GetContext();
+        var idToDelete = await context.PersistEntityAsync(new Item
         {
             Code        = "TOD_RV",
             Description = "To delete"
-        };
-        var context = _apiFactory.GetContext();
-        context.Add(item);
-        await context.SaveChangesAsync();
-        var idToDelete = item.ID;
+        });
 
         // Act
         var response = await client.DeleteAsync($"/items/{idToDelete}/3");

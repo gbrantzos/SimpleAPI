@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleAPI.Domain.Base;
 
 namespace SimpleAPI.IntegrationTests.Setup;
 
@@ -26,5 +27,12 @@ public static class DbContextExtensions
             await trans.RollbackAsync();
             context.ChangeTracker.Clear();
         });
+    }
+
+    public static async Task<int> PersistEntityAsync<TEntity>(this DbContext context, TEntity entity) where TEntity : Entity
+    {
+        context.Add(entity);
+        await context.SaveChangesAsync();
+        return entity.ID;
     }
 }

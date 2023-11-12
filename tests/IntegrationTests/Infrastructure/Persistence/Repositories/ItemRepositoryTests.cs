@@ -31,7 +31,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         await _database.Context.ExecuteAndRollbackAsync(async () =>
             {
                 // Act
-                await repository.AddAsync(item);
+                repository.Add(item);
                 await uow.SaveChangesAsync();
 
                 // Assert
@@ -85,7 +85,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 Code        = "Test.003",
                 Description = "Testing item persistence"
             };
-            await repository.AddAsync(item);
+            repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
@@ -189,7 +189,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             var dt1 = DateTime.Now;
             _database.TimeProviderMock.Setup(m => m.GetNow()).Returns(dt1);
 
-            await repository.AddAsync(item);
+            repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
@@ -225,7 +225,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 Code        = "Test.032",
                 Description = "Testing item persistence"
             };
-            await repository.AddAsync(item);
+            repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 

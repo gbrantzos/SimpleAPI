@@ -36,8 +36,8 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
         item.Description = request.ViewModel.Description;
 
         if (isNew)
-        {
-            await _itemRepository.AddAsync(item, cancellationToken);
+        { 
+            _itemRepository.Add(item);
         }
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
