@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using SimpleAPI.Application.Features.Items.UseCases.DeleteItem;
 using SimpleAPI.Application.Features.Items.UseCases.GetItem;
@@ -26,7 +27,19 @@ public class ItemEndpoints : IEndpointMapper
             .WithDescription("Retrieve an item by its ID.");
         group.MapPost("", SaveItem.Handle)
             .WithName("SaveItem")
-            .WithSummary("Save new item");
+            .WithSummary("Save new item")
+            .Produces<ItemViewModel>(200, "application/json");
+            // .WithOpenApi(op =>
+            // {
+            //     var example = new OpenApiExample
+            //     {
+            //         Summary     = "Example",
+            //         Description = "This is an example value",
+            //         Value       = new OpenApiString("{\"id\": 1}"),
+            //     };
+            //     op.Responses["200"].Content["application/json"].Examples.Add("base", example);
+            //     return op;
+            // });
         group.MapPut("{id:int}", UpdateItem.Handle)
             .WithName("UpdateItem")
             .WithSummary("Update existing item");

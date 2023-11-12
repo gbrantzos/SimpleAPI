@@ -1,0 +1,26 @@
+Items API
+-------------
+
+For aggregates:
+
+GET		/items			+ query parameters (filtering, sorting , paging)	-> returns 200, list of items
+GET		/items/{id}															-> returns 200, single item
+																			   returns 404, item not found
+POST	/items			+ Body												-> returns 201, newly created item (as GetByID)
+																			   returns 400, bad request (validation failed)
+PUT		/items/{id}		+ Body + ETag header (row version)					-> returns 200, modified item (as GetByID)
+																			   returns 400, bad request (validation failed)
+																			   returns 409, conflict (row version mismatch)
+DELETE	/items/{id}		+ ETag header (row version)							-> returns 204, no-content
+																			   returns 404, item not found
+																			   returns 409, conflict (row version mismatch)
+
+GET		/items/{query}	+ query parameters (using specific SQL query + filtering, sorting , paging)
+
+
+
+
+For arrays:
+
+GET		/product-types	-> returns 200, list of product-types
+POST	/product-types	-> returns 200, list of modified product-types
