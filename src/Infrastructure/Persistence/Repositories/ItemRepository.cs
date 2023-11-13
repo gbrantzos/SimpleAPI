@@ -16,7 +16,7 @@ public class ItemRepository : IItemRepository
         _context.Items.Add(item);
     }
 
-    public async Task<Item?> GetByIDAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Item?> GetByIDAsync(ItemID id, CancellationToken cancellationToken = default)
     {
         var result = await _context.Items.FindAsync(new object[] { id }, cancellationToken);
         return result;

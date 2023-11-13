@@ -43,7 +43,7 @@ public class SaveItemHandlerTests
             Code        = "Code",
             Description = "Valid Item"
         }, opt => opt.Excluding(i => i.RowVersion));
-        
+
         _mockRepository.VerifyAll();
     }
 
@@ -64,12 +64,12 @@ public class SaveItemHandlerTests
 
         var existingItem = new Item
         {
-            ID          = 4,
+            ID          = new ItemID(4),
             RowVersion  = 3,
             Code        = "Code",
             Description = "Valid item"
         };
-        mockRepo.Setup(m => m.GetByIDAsync(It.Is<int>(i => i == 4), cancellationToken))
+        mockRepo.Setup(m => m.GetByIDAsync(It.Is<ItemID>(i => i == new ItemID(4)), cancellationToken))
             .ReturnsAsync(existingItem);
         mockUnitOfWork.Setup(m => m.SaveChangesAsync(cancellationToken))
             .Returns(Task.CompletedTask);
@@ -87,7 +87,7 @@ public class SaveItemHandlerTests
             Code        = "Code",
             Description = "Valid Item"
         }, opt => opt.Excluding(i => i.RowVersion));
-        
+
         _mockRepository.VerifyAll();
     }
 
@@ -105,7 +105,7 @@ public class SaveItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
-        mockRepo.Setup(m => m.GetByIDAsync(It.Is<int>(i => i == 4), cancellationToken))
+        mockRepo.Setup(m => m.GetByIDAsync(It.Is<ItemID>(i => i == new ItemID(4)), cancellationToken))
             .ReturnsAsync((Item)null!);
 
         // Act
@@ -118,7 +118,7 @@ public class SaveItemHandlerTests
 
         var error = result.Error;
         error.Kind.Should().Be(ErrorKind.NotFound);
-        
+
         _mockRepository.VerifyAll();
     }
 
@@ -141,7 +141,7 @@ public class SaveItemHandlerTests
         {
             RowVersion = 5
         };
-        mockRepo.Setup(m => m.GetByIDAsync(It.Is<int>(i => i == 14), cancellationToken))
+        mockRepo.Setup(m => m.GetByIDAsync(It.Is<ItemID>(i => i == new ItemID(14)), cancellationToken))
             .ReturnsAsync(existing);
 
         // Act
@@ -154,7 +154,7 @@ public class SaveItemHandlerTests
 
         var error = result.Error;
         error.Kind.Should().Be(ErrorKind.ModifiedEntry);
-        
+
         _mockRepository.VerifyAll();
     }
 }

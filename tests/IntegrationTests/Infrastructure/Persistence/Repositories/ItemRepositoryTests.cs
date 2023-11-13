@@ -60,7 +60,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             _database.Context.ChangeTracker.Clear();
             
             // Act
-            var existing = await repository.GetByIDAsync(item.ID) ??
+            var existing = await repository.GetByIDAsync(item.ID!) ??
                 throw new InvalidOperationException("Existing item is null");
             existing.Description = "This a changed description";
             await uow.SaveChangesAsync();
@@ -137,7 +137,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             var expected = items.Last();
 
             // Act 
-            var actual = await repository.GetByIDAsync(expected.ID);
+            var actual = await repository.GetByIDAsync(expected.ID!);
 
             // Assert
             actual.Should().NotBeNull();
@@ -166,7 +166,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             // Assert
             item.RowVersion.Should().Be(1);
             _database.Context.ChangeTracker.Clear();
-            var existing = await repository.GetByIDAsync(item.ID) ??
+            var existing = await repository.GetByIDAsync(item.ID!) ??
                 throw new InvalidOperationException("Existing item is null");
             existing.RowVersion.Should().Be(item.RowVersion);
         });
@@ -193,7 +193,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
-            var existingItem = await repository.GetByIDAsync(item.ID) ??
+            var existingItem = await repository.GetByIDAsync(item.ID!) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             _database.Context.Entry(existingItem).Property(SimpleAPIContext.CreatedAt).CurrentValue.Should().Be(dt1);
             _database.Context.Entry(existingItem).Property(SimpleAPIContext.ModifiedAt).CurrentValue.Should().Be(dt1);
@@ -205,7 +205,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
-            var modifiedItem = await repository.GetByIDAsync(item.ID) ??
+            var modifiedItem = await repository.GetByIDAsync(item.ID!) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             _database.Context.Entry(modifiedItem).Property(SimpleAPIContext.CreatedAt).CurrentValue.Should().Be(dt1);
             _database.Context.Entry(modifiedItem).Property(SimpleAPIContext.ModifiedAt).CurrentValue.Should().Be(dt2);
@@ -229,13 +229,13 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
-            var existingItem = await repository.GetByIDAsync(item.ID) ??
+            var existingItem = await repository.GetByIDAsync(item.ID!) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             existingItem.Description = "Modified description";
 
             using (_database.Context.Database.BeginTransactionAsync())
             {
-                var sql = $"update `item` set `description`='New', `row_version`=`row_version` +1 where `id` = {existingItem.ID}";
+                var sql = $"update `item` set `description`='New', `row_version`=`row_version` +1 where `id` = {existingItem.ID!.Value}";
                 await _database.Context.Database.ExecuteSqlRawAsync(sql);
             }
 

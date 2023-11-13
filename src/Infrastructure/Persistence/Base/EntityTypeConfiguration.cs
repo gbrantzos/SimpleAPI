@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleAPI.Core;
 using SimpleAPI.Domain.Base;
 
 namespace SimpleAPI.Infrastructure.Persistence.Base;
 
-public abstract class EntityTypeConfiguration<TEntity> : IEntityTypeConfiguration<TEntity> where TEntity : Entity
+public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeConfiguration<TEntity>
+    where TEntity : Entity<TEntityID>
+    where TEntityID : EntityID, new()
 {
     public virtual void Configure(EntityTypeBuilder<TEntity> builder)
     {
@@ -16,6 +19,8 @@ public abstract class EntityTypeConfiguration<TEntity> : IEntityTypeConfiguratio
         builder.HasKey(e => e.ID).HasName($"pk_{entityName}");
         builder.Property(e => e.ID)
             .HasColumnName(SimpleAPIContext.ID)
+            .HasConversion<EntityIDConverter<TEntityID>>()
+            .ValueGeneratedOnAdd()
             .HasColumnOrder(-20);
 
         builder.Property(e => e.RowVersion)
@@ -26,13 +31,21 @@ public abstract class EntityTypeConfiguration<TEntity> : IEntityTypeConfiguratio
         builder.Property<DateTime>(SimpleAPIContext.CreatedAt).HasColumnOrder(-12);
         builder.Property<DateTime>(SimpleAPIContext.ModifiedAt).HasColumnOrder(-11);
 
+        builder.Ignore(e => e.IsNew);
+
         var properties = entityType
             .GetProperties()
             .Select(p => p.Name)
-            .Except(new string[] { nameof(Entity.ID), nameof(Entity.RowVersion) });
+            .Except(new string[] { "ID", "IsNew", nameof(Entity.RowVersion) });
         foreach (var property in properties)
         {
             builder.Property(property).HasColumnName(property.ToSnakeCase());
         }
     }
+}
+
+// TODO Check if we can skip this with a more generic class (generators)
+public class EntityIDConverter<TEntityID> : ValueConverter<TEntityID, int> where TEntityID : EntityID, new()
+{
+    public EntityIDConverter() : base(v => v.Value, v => new TEntityID { Value = v }) { }
 }

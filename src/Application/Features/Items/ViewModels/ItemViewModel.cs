@@ -14,7 +14,7 @@ public static class ItemViewModelExtensions
     public static ItemViewModel ToViewModel(this Item item)
         => new()
         {
-            ID          = item.ID,
+            ID          = item.ID?.Value ?? 0,
             RowVersion  = item.RowVersion,
             Code        = item.Code,
             Description = item.Description

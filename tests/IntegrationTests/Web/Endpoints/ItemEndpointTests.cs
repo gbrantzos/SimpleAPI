@@ -113,7 +113,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         // Arrange
         var client = _apiFactory.CreateClient();
         var context = _apiFactory.GetContext();
-        var existingID = await context.PersistEntityAsync(new Item
+        var existingID = await context.PersistEntityAsync<Item, ItemID>(new Item
         {
             Code        = "412",
             Description = "Existing item"
@@ -140,7 +140,8 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         expected.ID = existingID;
         expected.RowVersion++;
 
-        actual.Should().BeEquivalentTo(expected);
+        actual.Should().NotBeNull();
+        actual!.ToViewModel().Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -170,7 +171,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         // Arrange
         var client = _apiFactory.CreateClient();
         var context = _apiFactory.GetContext();
-        var existingID = await context.PersistEntityAsync(new Item
+        var existingID = await context.PersistEntityAsync<Item, ItemID>(new Item
         {
             Code        = "412",
             Description = "Existing item"
@@ -215,7 +216,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         // Arrange
         var client = _apiFactory.CreateClient();
         var context = _apiFactory.GetContext();
-        var idToDelete = await context.PersistEntityAsync(new Item
+        var idToDelete = await context.PersistEntityAsync<Item, ItemID>(new Item
         {
             Code        = "TOD",
             Description = "To delete"
@@ -228,7 +229,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         response.ShouldReturn(HttpStatusCode.NoContent);
 
         // Database assert
-        var actual = context.Items.SingleOrDefault(i => i.ID == idToDelete);
+        var actual = context.Items.SingleOrDefault(i => i.ID == new ItemID(idToDelete));
         actual.Should().BeNull();
     }
 
@@ -251,7 +252,7 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         // Arrange
         var client = _apiFactory.CreateClient();
         var context = _apiFactory.GetContext();
-        var idToDelete = await context.PersistEntityAsync(new Item
+        var idToDelete = await context.PersistEntityAsync<Item, ItemID>(new Item
         {
             Code        = "TOD_RV",
             Description = "To delete"

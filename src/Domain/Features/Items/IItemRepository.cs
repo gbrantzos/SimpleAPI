@@ -8,7 +8,7 @@ public interface IItemRepository
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Item?> GetByIDAsync(int id, CancellationToken cancellationToken = default);
+    Task<Item?> GetByIDAsync(ItemID id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Add entity to repository for saving

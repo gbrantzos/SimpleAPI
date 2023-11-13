@@ -22,7 +22,7 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
         var isNew = request.ItemID == 0;
         var item = isNew
             ? new Item()
-            : await _itemRepository.GetByIDAsync(request.ItemID, cancellationToken);
+            : await _itemRepository.GetByIDAsync(new ItemID(request.ItemID), cancellationToken);
         if (item is null)
         {
             return Error.Create(ErrorKind.NotFound, $"Entity not found, ID: {request.ItemID}");
@@ -36,7 +36,7 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
         item.Description = request.ViewModel.Description;
 
         if (isNew)
-        { 
+        {
             _itemRepository.Add(item);
         }
         await _unitOfWork.SaveChangesAsync(cancellationToken);

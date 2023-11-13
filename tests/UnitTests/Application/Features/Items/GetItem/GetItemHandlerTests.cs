@@ -10,7 +10,7 @@ namespace SimpleAPI.UnitTests.Application.Features.Items.GetItem;
 public class GetItemHandlerTests
 {
     private readonly MockRepository _mockRepository = new(MockBehavior.Strict);
-    
+
     [Fact]
     public async Task When_RequestedItemExists_EntityIsReturned()
     {
@@ -21,13 +21,13 @@ public class GetItemHandlerTests
 
         var existing = new Item()
         {
-            ID          = 12,
+            ID          = new ItemID(12),
             Code        = "Test.123",
             Description = "Testing Item"
         };
-        mockRepo.Setup(m => m.GetByIDAsync(12, cancellationToken))
+        mockRepo.Setup(m => m.GetByIDAsync(new ItemID(12), cancellationToken))
             .ReturnsAsync(existing);
-        
+
         // Act
         var handler = new GetItemHandler(mockRepo.Object);
         var result = await handler.Handle(request, cancellationToken);
@@ -37,10 +37,10 @@ public class GetItemHandlerTests
         result.Should().NotBeNull();
         result.HasErrors.Should().BeFalse();
         result.Data.Should().BeEquivalentTo(expected);
-        
+
         _mockRepository.VerifyAll();
     }
-    
+
     [Fact]
     public async Task When_RequestedItemDoesExists_ReturnsError()
     {
@@ -49,7 +49,7 @@ public class GetItemHandlerTests
         var mockRepo = _mockRepository.Create<IItemRepository>();
         var cancellationToken = CancellationToken.None;
 
-        mockRepo.Setup(m => m.GetByIDAsync(12, cancellationToken))
+        mockRepo.Setup(m => m.GetByIDAsync(new ItemID(12), cancellationToken))
             .ReturnsAsync((Item)null!);
 
         // Act
@@ -65,5 +65,4 @@ public class GetItemHandlerTests
 
         _mockRepository.VerifyAll();
     }
-
 }

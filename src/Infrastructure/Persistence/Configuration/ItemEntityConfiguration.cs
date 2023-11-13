@@ -4,7 +4,7 @@ using SimpleAPI.Infrastructure.Persistence.Base;
 
 namespace SimpleAPI.Infrastructure.Persistence.Configuration;
 
-public class ItemEntityConfiguration : EntityTypeConfiguration<Item>
+public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
 {
     public override void Configure(EntityTypeBuilder<Item> builder)
     {
