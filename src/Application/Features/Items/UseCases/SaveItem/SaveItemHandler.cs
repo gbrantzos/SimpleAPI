@@ -1,7 +1,9 @@
 using SimpleAPI.Application.Base;
 using SimpleAPI.Application.Common;
 using SimpleAPI.Application.Features.Items.ViewModels;
+using SimpleAPI.Core;
 using SimpleAPI.Core.Base;
+using SimpleAPI.Core.Guards;
 using SimpleAPI.Domain.Features.Items;
 
 namespace SimpleAPI.Application.Features.Items.UseCases.SaveItem;
@@ -13,12 +15,14 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
 
     public SaveItemHandler(IItemRepository itemRepository, IUnitOfWork unitOfWork)
     {
-        _itemRepository = itemRepository;
-        _unitOfWork     = unitOfWork;
+        _itemRepository = itemRepository.ThrowIfNull();
+        _unitOfWork     = unitOfWork.ThrowIfNull();
     }
 
     public override async Task<Result<ItemViewModel, Error>> Handle(SaveItemCommand request, CancellationToken cancellationToken)
     {
+        Ensure.NotNull(request);
+        
         var isNew = request.ItemID == 0;
         var item = isNew
             ? new Item()

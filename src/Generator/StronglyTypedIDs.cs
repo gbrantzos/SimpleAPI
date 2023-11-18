@@ -6,6 +6,8 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace SimpleAPI.Generator;
 
+// Ideas on https://www.meziantou.net/strongly-typed-ids-with-csharp-source-generators.htm
+
 [Generator(LanguageNames.CSharp)]
 public class StronglyTypedIDs : IIncrementalGenerator
 {

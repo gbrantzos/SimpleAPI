@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace SimpleAPI.Core;
 
-public static class Extensions
+public static class LoggingExtensions
 {
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {

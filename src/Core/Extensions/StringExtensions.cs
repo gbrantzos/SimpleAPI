@@ -7,6 +7,12 @@ public static class StringExtensions
 {
     // Method based on https://stackoverflow.com/a/67332992/3410871
     // ReSharper disable once CognitiveComplexity
+    
+    /// <summary>
+    /// Convert to snake case
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     public static string ToSnakeCase(this string text)
     {
         if (string.IsNullOrEmpty(text))
@@ -67,6 +73,17 @@ public static class StringExtensions
         }
 
         return builder.ToString();
+    }
+    
+    /// <summary>
+    /// Convert to camel case
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static string ToCamelCase(this string value)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        return char.ToLowerInvariant(value[0]) + value.Substring(1);
     }
 }
 

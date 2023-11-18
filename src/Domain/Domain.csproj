@@ -4,6 +4,12 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <!-- 👇 Optional: Output the generated files to the disk, so you can see the result of the
+    Source Generators under the "obj" folder. This is useful for debugging purpose. -->
+    <EmitCompilerGeneratedFiles>false</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+
   </PropertyGroup>
 
   <PropertyGroup>
