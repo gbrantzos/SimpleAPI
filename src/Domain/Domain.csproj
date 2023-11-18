@@ -10,9 +10,10 @@
     <AssemblyName>SimpleAPI.Domain</AssemblyName>
     <RootNamespace>SimpleAPI.Domain</RootNamespace>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj"/>
+    <ProjectReference Include="..\Generator\Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

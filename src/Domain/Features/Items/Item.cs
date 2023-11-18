@@ -1,13 +1,9 @@
 using SimpleAPI.Domain.Base;
+using SimpleAPI.Generator;
 
 namespace SimpleAPI.Domain.Features.Items;
 
-public class ItemID : EntityID
-{
-    public ItemID(int id) : base(id) { }
-    public ItemID() : base(0) { }
-}
-
+[HasStronglyTypedID]
 public class Item : Entity<ItemID>
 {
     public string Code { get; set; } = String.Empty;
