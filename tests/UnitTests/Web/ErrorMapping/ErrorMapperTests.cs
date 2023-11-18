@@ -13,7 +13,7 @@ public class ErrorMapperTests
     private readonly MockRepository _mockRepository = new(MockBehavior.Strict);
 
     [Fact]
-    public void Ensure_AllEnums_Tested()
+    public void Ensure_all_nums_are_tested()
     {
         // Arrange
         var enumCount = Enum.GetValues(typeof(ErrorKind)).Length;
@@ -25,7 +25,7 @@ public class ErrorMapperTests
     
     [Theory]
     [ClassData(typeof(ErrorData))]
-    public void When_ErrorReceived_ProblemDetailsReturned(Error error, ProblemDetails expected)
+    public void When_error_received_ProblemDetails_is_returned(Error error, ProblemDetails expected)
     {
         // Arrange
         var contextProvider = new RequestContextProvider();

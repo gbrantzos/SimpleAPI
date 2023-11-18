@@ -6,7 +6,7 @@ public static class Helpers
 
     public const string StronglyTypeAttributeNameCode =
         $$"""
-        namespace SimpleAPI.Generator
+        namespace SimpleAPI.Core
         {
             [System.AttributeUsage(System.AttributeTargets.Class)]
             public class {{StronglyTypeAttributeName}} : System.Attribute { }

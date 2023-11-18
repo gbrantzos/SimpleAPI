@@ -39,4 +39,8 @@
   <ItemGroup>
     <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage"/>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="TestResults\4b11e2c2-c1c5-488b-81d1-1ffe8f0a278f\" />
+  </ItemGroup>
 </Project>

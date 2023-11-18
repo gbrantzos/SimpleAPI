@@ -19,7 +19,7 @@ public class ContextProviderTests
     }
 
     [Fact]
-    public void When_AwaitableIsCalled_ContextPreserved()
+    public void When_awaitable_is_called_context_preserved()
     {
         // Arrange
         var context = new TestContext();

@@ -15,7 +15,7 @@ public class StringExtensionsTests
     [InlineData("", "")]
     [InlineData("12items", "12items")]
     [InlineData("12ItemsSold", "12items_sold")]
-    public void Should_ConvertInput_ToSnakeCase(string sample, string expected)
+    public void Should_convert_input_to_snake_case(string sample, string expected)
     {
         var actual = sample.ToSnakeCase();
         actual.Should().Be(expected);

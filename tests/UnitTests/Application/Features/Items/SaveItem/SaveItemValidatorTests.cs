@@ -7,7 +7,7 @@ namespace SimpleAPI.UnitTests.Application.Features.Items.SaveItem;
 public class SaveItemValidatorTests
 {
     [Fact]
-    public void When_ItemIsValid_ReturnsIsValid()
+    public void When_item_is_valid_return_valid()
     {
         // Arrange
         var item = new ItemViewModel()
@@ -28,7 +28,7 @@ public class SaveItemValidatorTests
     }
 
     [Fact]
-    public void When_CodeIsEmpty_ReturnsValidationError()
+    public void When_code_is_empty_return_ValidationError()
     {
         // Arrange
         var item = new ItemViewModel()

@@ -18,7 +18,7 @@ public class ValueObjectTests
     }
     
     [Fact]
-    public void SameValues_AreEqual()
+    public void Same_values_are_equal()
     {
         // Arrange
         var vo1 = new SampleValueObject() { ID = 1, Sequence = 3 };
@@ -33,7 +33,7 @@ public class ValueObjectTests
     }
     
     [Fact]
-    public void NullValues_AreNotEqual()
+    public void Null_values_are_not_equal()
     {
         // Arrange
         var vo1 = new SampleValueObject() { ID = 1, Sequence = 3 };

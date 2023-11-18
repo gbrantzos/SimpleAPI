@@ -13,7 +13,7 @@ public class SaveItemHandlerTests
     private readonly MockRepository _mockRepository = new(MockBehavior.Strict);
 
     [Fact]
-    public async Task When_RequestIsValidNewItem_ReturnsItemViewModel()
+    public async Task When_request_is_valid_new_item_return_item_ViewModel()
     {
         // Arrange
         var viewModel = new ItemViewModel
@@ -48,7 +48,7 @@ public class SaveItemHandlerTests
     }
 
     [Fact]
-    public async Task When_RequestIsValidExistingItem_ReturnsItemViewModel()
+    public async Task When_request_is_valid_existing_item_return_item_ViewModel()
     {
         // Arrange
         var viewModel = new ItemViewModel
@@ -92,7 +92,7 @@ public class SaveItemHandlerTests
     }
 
     [Fact]
-    public async Task When_RequestIsUnknownItem_ReturnsError()
+    public async Task When_request_is_unknown_item_return_error()
     {
         // Arrange
         var viewModel = new ItemViewModel
@@ -123,7 +123,7 @@ public class SaveItemHandlerTests
     }
 
     [Fact]
-    public async Task When_RequestRowVersionIsDifferent_ReturnsError()
+    public async Task When_request_has_different_RowVersion_return_error()
     {
         // Arrange
         var viewModel = new ItemViewModel

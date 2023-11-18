@@ -12,7 +12,7 @@ public class GetItemHandlerTests
     private readonly MockRepository _mockRepository = new(MockBehavior.Strict);
 
     [Fact]
-    public async Task When_RequestedItemExists_EntityIsReturned()
+    public async Task When_item_exists_entity_is_returned()
     {
         // Arrange
         var request = new GetItemCommand(12);
@@ -42,7 +42,7 @@ public class GetItemHandlerTests
     }
 
     [Fact]
-    public async Task When_RequestedItemDoesExists_ReturnsError()
+    public async Task When_item_does_not_exists_return_error()
     {
         // Arrange
         var request = new GetItemCommand(12);

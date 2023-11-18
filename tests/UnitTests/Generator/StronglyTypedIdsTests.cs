@@ -5,7 +5,7 @@ namespace SimpleAPI.UnitTests.Generator;
 public class StronglyTypedIdsTests
 {
     [Fact]
-    public void Generator_Tests()
+    public void Should_create_EntityID_from_class()
     {
         var input = """
                     using SimpleAPI.Generator;

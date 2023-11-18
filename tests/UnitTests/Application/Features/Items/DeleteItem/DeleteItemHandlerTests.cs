@@ -12,7 +12,7 @@ public class DeleteItemHandlerTests
     private readonly MockRepository _mockRepository = new(MockBehavior.Strict);
 
     [Fact]
-    public async Task When_RequestedItemExists_EntityIsDeleted()
+    public async Task When_item_exists_entity_is_deleted()
     {
         // Arrange
         var request = new DeleteItemCommand(12, 7);
@@ -44,7 +44,7 @@ public class DeleteItemHandlerTests
     }
 
     [Fact]
-    public async Task When_RequestedItemDoesExists_ReturnsError()
+    public async Task When_item_does_not_exist_return_error()
     {
         // Arrange
         var request = new DeleteItemCommand(12, 8);
@@ -70,7 +70,7 @@ public class DeleteItemHandlerTests
     }
 
     [Fact]
-    public async Task When_RequestedDifferentRowVersion_ReturnsError()
+    public async Task When_request_has_different_RowVersion_return_error()
     {
         // Arrange
         var request = new DeleteItemCommand(12, 8);
