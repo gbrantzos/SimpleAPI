@@ -31,11 +31,11 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
             sw.Stop();
             var result = (Result<TResponse, Error>)response;
             result.Match(
-                _ => _logger.LogInformation("[{RequestType}] Executed successfully => {Request} ({ElapsedMs}ms)",
+                _ => _logger.LogInformation("[{RequestType}] => {Request} executed successfully ({ElapsedMs}ms)",
                     requestType,
                     request,
                     sw.ElapsedMilliseconds),
-                error => _logger.LogWarning("[{RequestType}] Execution failed => {Request} ({ElapsedMs}ms)\n{ErrorMessage}",
+                error => _logger.LogWarning("[{RequestType}] => {Request} execution failed ({ElapsedMs}ms)\n{ErrorMessage}",
                     requestType,
                     request,
                     sw.ElapsedMilliseconds,
@@ -44,11 +44,19 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
 
             return response;
         }
-        catch
+        catch (OperationCanceledException tx)
         {
-            _logger.LogWarning("[{RequestType}] Execution failed, unhandled exception => {Request}\n\n{RequestJson}\n",
+            _logger.LogWarning("[{RequestType}] => execution was cancelled: {Cancellation}\n\n{RequestJson}\n",
                 requestType,
-                request,
+                tx.Message,
+                request.ToJsonForLogging());
+            throw;
+        }
+        catch (Exception x)
+        {
+            _logger.LogWarning("[{RequestType}] => execution failed, unhandled exception: {Unhandled}\n\n{RequestJson}\n",
+                requestType,
+                x.Message,
                 request.ToJsonForLogging());
             throw;
         }

@@ -1,5 +1,6 @@
 using Prometheus;
 using Serilog;
+using Serilog.Events;
 using SimpleAPI.Web.Setup.Context;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -14,7 +15,17 @@ public static class ApplicationBuilderExtensions
 
         builder.UseExceptionHandler();
         builder.UseStatusCodePages();
-        builder.UseSerilogRequestLogging();
+        builder.UseSerilogRequestLogging(options =>
+        {
+            var serilog = options.GetLevel;
+            options.GetLevel = (context, elapsed, ex) =>
+            {
+                if (ex is OperationCanceledException)
+                    return LogEventLevel.Verbose;
+                    
+                return serilog(context, elapsed, ex);
+            };
+        });
         builder.UseHttpMetrics();
 
         if (environment.IsDevelopment())

@@ -19,7 +19,7 @@ public class GetItemHandler : Handler<GetItemCommand, ItemViewModel>
     public override async Task<Result<ItemViewModel, Error>> Handle(GetItemCommand request, CancellationToken cancellationToken)
     {
         Ensure.NotNull(request);
-        
+
         var existing = await _repository.GetByIDAsync(new ItemID(request.ID), cancellationToken);
         if (existing is null)
             return Error.Create(ErrorKind.NotFound, $"Entity with ID {request.ID} not found");
