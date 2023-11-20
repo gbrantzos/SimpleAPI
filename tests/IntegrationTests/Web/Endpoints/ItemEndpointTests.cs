@@ -162,9 +162,6 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
 
         // Assert
         response.ShouldReturn(HttpStatusCode.NotFound, "application/problem+json");
-        var content = await response.Content.ReadAsStringAsync();
-        var problemDetails = JsonSerializer.Deserialize<ProblemDetails>(content);
-        // TODO Add assertions on problem details
     }
 
     [Fact]
