@@ -24,7 +24,7 @@ public static class AssertionExtensions
 
     public static Task<HttpResponseMessage> PostStringAsJsonAsync(this HttpClient client,
         [StringSyntax(StringSyntaxAttribute.Uri)]
-        string? requestUri,
+        string requestUri,
         string json)
         => client.PostAsync(requestUri, new StringContent(
             json,
@@ -34,7 +34,7 @@ public static class AssertionExtensions
 
     public static Task<HttpResponseMessage> PutStringAsJsonAsync(this HttpClient client,
         [StringSyntax(StringSyntaxAttribute.Uri)]
-        string? requestUri,
+        string requestUri,
         string json)
         => client.PutAsync(requestUri, new StringContent(
             json,

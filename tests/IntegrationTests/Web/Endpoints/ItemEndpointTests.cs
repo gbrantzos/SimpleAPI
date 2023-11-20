@@ -72,6 +72,8 @@ public class ItemEndpointTests : IClassFixture<SimpleAPIFactory>
         var response = await client.GetAsync("/items/abc");
 
         // Assert
+        // TBH, this should return 404 with a validation error, but route constraint
+        // do not perform validation, rather than matching :(
         response.ShouldReturn(HttpStatusCode.NotFound, "application/problem+json");
     }
 
