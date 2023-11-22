@@ -1,3 +1,6 @@
+using SimpleAPI.Core;
+using SimpleAPI.Core.Guards;
+
 namespace SimpleAPI.Web.Setup.Context;
 
 public class RequestContextMiddleware
@@ -7,12 +10,14 @@ public class RequestContextMiddleware
 
     public RequestContextMiddleware(RequestDelegate next, RequestContextProvider contextProvider)
     {
-        _next            = next;
-        _contextProvider = contextProvider;
+        _next            = next.ThrowIfNull();
+        _contextProvider = contextProvider.ThrowIfNull();
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
+        Ensure.NotNull(context);
+        
         _contextProvider.CurrentContext = RequestContext.Create();
         context.Response.Headers.Add("X-Request-StartedOn", _contextProvider.CurrentContext.StartedOn.ToLongDateString());
         await _next(context);

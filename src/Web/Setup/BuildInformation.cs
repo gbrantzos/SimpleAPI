@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 
@@ -6,7 +7,7 @@ namespace SimpleAPI.Web.Setup;
 public class BuildInformation
 {
     public string Version { get; private init; } = "0.1.0";
-    public string[] Tags { get; private init; } = Array.Empty<string>();
+    public IReadOnlyCollection<string> Tags { get; private init; } = Array.Empty<string>();
     public DateTime BuildAt { get; private init; } = DateTime.MinValue;
     public string Commit { get; private init; } = String.Empty;
     public bool IsDirty { get; private init; }
@@ -15,6 +16,7 @@ public class BuildInformation
 
     public static BuildInformation Instance { get; }
 
+    [SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations")]
     static BuildInformation()
     {
         var type = typeof(BuildInformation);
@@ -58,7 +60,7 @@ public class BuildInformation
     public string ToDisplayString()
     {
         var isDirty = IsDirty ? " [DIRTY repo]" : String.Empty;
-        var tags = Tags.Length == 0 ? "No tags" : String.Join(", ", Tags);
+        var tags = Tags.Count == 0 ? "No tags" : String.Join(", ", Tags);
         return
             $"Version: \t{Version}\nCommit:\t\t{Commit}{isDirty}\nTags:\t\t{tags}\nBuild at:\t{BuildAt:yyyy/MM/dd HH:mm:ss} - [{Mode} build]";
     }

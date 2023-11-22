@@ -25,9 +25,11 @@ public sealed class Result<TData, TError>
         HasErrors = hasErrors;
     }
 
+    #pragma warning disable CA2225
     public static implicit operator Result<TData, TError>(TData data) => new(data);
     public static implicit operator Result<TData, TError>(TError error) => new(default, error, true);
-
+    #pragma warning restore CA2225
+    
     public T Match<T>(Func<TData, T> dataFunc, Func<TError, T> errorFunc)
     {
         ArgumentNullException.ThrowIfNull(dataFunc);
@@ -51,10 +53,11 @@ public sealed class Result<TData, TError>
     public TData Data =>
         HasErrors
             ? throw new InvalidOperationException("Result has errors.")
-            : _data ?? throw new ArgumentNullException(nameof(_data));
+            : _data!;
 
     public TError Error =>
         HasErrors
-            ? _error ?? throw new ArgumentNullException(nameof(_error))
+            ? _error!
             : throw new InvalidOperationException("Result does not have errors.");
+
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace SimpleAPI.Core.Guards;
@@ -11,7 +12,7 @@ public static class Ensure
     /// <param name="parameterName"></param>
     /// <param name="message"></param>
     /// <typeparam name="T"></typeparam>
-    public static void NotNull<T>(T parameter,
+    public static void NotNull<T>([NotNull] T parameter,
         [CallerArgumentExpression("parameter")]
         string? parameterName = null,
         string? message = null) where T : class

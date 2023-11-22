@@ -2,7 +2,7 @@ using Prometheus;
 
 namespace SimpleAPI.Application.Common.Metrics;
 
-public class SimpleAPIMetrics
+public static class SimpleAPIMetrics
 {
     public static readonly Counter RequestsCounter = Prometheus.Metrics
         .CreateCounter("simple_requests_counter",
