@@ -43,8 +43,8 @@ public class SimpleAPIContext : DbContext
         }
 
         // Proper ROW_VERSION number for modified entries
-        var allEntries = ChangeTracker.Entries<Entity>();
-        foreach (var entry in allEntries)
+        var allVersionedEntries = ChangeTracker.Entries<IVersioned>();
+        foreach (var entry in allVersionedEntries)
         {
             // Increase row version
             if (entry.State == EntityState.Modified || entry.Navigations.Any(n => n.IsModified))

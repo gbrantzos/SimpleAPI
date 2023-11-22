@@ -1,9 +1,6 @@
 namespace SimpleAPI.Domain.Base;
 
-public abstract class Entity
-{
-    public int RowVersion { get; set; } // TODO Move to an interface
-}
+public abstract class Entity { }
 
 public abstract class Entity<TEntityID> : Entity where TEntityID : IEntityID
 {
