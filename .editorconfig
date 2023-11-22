@@ -151,8 +151,8 @@ csharp_space_between_method_call_empty_parameter_list_parentheses = false
 csharp_preserve_single_line_statements = true
 csharp_preserve_single_line_blocks = true
 
-dotnet_diagnostic.ca1848.severity = none
-dotnet_diagnostic.ca1716.severity = none
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA1716.severity = none
 
 dotnet_diagnostic.CA2007.severity = none
 
@@ -161,3 +161,4 @@ dotnet_diagnostic.CA1062.severity = none
 
 # The following is mostly for libraries, we can safely skip
 dotnet_diagnostic.CA1724.severity = none
+dotnet_diagnostic.CA1867.severity = none

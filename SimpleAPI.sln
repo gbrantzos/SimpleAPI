@@ -8,9 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "src\Web\Web.csproj",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{0D84415B-CB4A-494D-9B6E-B81E2637D140}"
 	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		docs\ItemsAPI.txt = docs\ItemsAPI.txt
+		src\Directory.Build.props = src\Directory.Build.props
+		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "src\Core\Core.csproj", "{4363CC1F-A033-44D2-805D-8821AA8381E6}"
