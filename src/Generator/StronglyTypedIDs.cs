@@ -48,19 +48,62 @@ public class StronglyTypedIDs : IIncrementalGenerator
 
             var symbolName = symbol.Name;
             var symbolNamespace = symbol.ContainingNamespace;
-            var code = $$"""
-                         using SimpleAPI.Domain.Base;
+            var stronglyTypedID = PrepareStronglyTypedID(symbolName, symbolNamespace.ToString());
+            context.AddSource($"SimpleAPI.{symbolName}.TypedID.g.cs", stronglyTypedID);
 
-                         namespace {{symbolNamespace}};
-
-                         public class {{symbolName}}ID : EntityID
-                         {
-                             public {{symbolName}}ID(int id) : base(id) { }
-                             public {{symbolName}}ID() : base(0) { }
-                         }
-                         """;
-            var hintName = $"SimpleAPI.{symbolName}.StronglyTypedID.g.cs";
-            context.AddSource(hintName, code);
+            // var typeIDConversion = PrepareTypeIDConversion(symbolName, symbolNamespace.ToString());
+            // context.AddSource($"SimpleAPI.{symbolName}.EntityConversion.g.cs", typeIDConversion);
         }
+    }
+
+    private static string PrepareStronglyTypedID(string symbolName, string symbolNamespace)
+    {
+        // https://andrewlock.net/strongly-typed-id-updates/
+        return $$"""
+                 using SimpleAPI.Domain.Base;
+
+                 namespace {{symbolNamespace}};
+
+                 public readonly struct {{symbolName}}ID : IComparable<{{symbolName}}ID>, IEquatable<{{symbolName}}ID>, IEntityID
+                 {
+                     public int Value { get; }
+                 
+                     public {{symbolName}}ID(int value) => Value = value;
+                     
+                     
+                     public bool Equals({{symbolName}}ID other) => this.Value.Equals(other.Value);
+                     public int CompareTo({{symbolName}}ID other) => Value.CompareTo(other.Value);
+                 
+                     public override bool Equals(object obj)
+                     {
+                         if (ReferenceEquals(null, obj)) return false;
+                         return obj is {{symbolName}}ID other && Equals(other);
+                     }
+                 
+                     public override int GetHashCode() => Value.GetHashCode();
+                     public override string ToString() => Value.ToString();
+                 
+                     public static bool operator ==({{symbolName}}ID a, {{symbolName}}ID b) => a.CompareTo(b) == 0;
+                     public static bool operator !=({{symbolName}}ID a, {{symbolName}}ID b) => !(a == b);
+                 }
+                 """;
+    }
+
+    private static string PrepareTypeIDConversion(string symbolName, string symbolNamespace)
+    {
+        return $$"""
+                 using {{symbolNamespace}};
+                 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+                 namespace SimpleAPI.Infrastructure.Persistence.Configuration;
+
+                 public class {{symbolName}}IDConverter : ValueConverter<{{symbolName}}ID, int>
+                 {
+                     public {{symbolName}}IDConverter() : base(
+                        v => v.Value,
+                        v => new {{symbolName}}ID(v)
+                    ) { }
+                 }
+                 """;
     }
 }

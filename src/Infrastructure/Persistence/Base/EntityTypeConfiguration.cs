@@ -8,7 +8,7 @@ namespace SimpleAPI.Infrastructure.Persistence.Base;
 
 public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeConfiguration<TEntity>
     where TEntity : Entity<TEntityID>
-    where TEntityID : EntityID, new()
+    where TEntityID : IEntityID
 {
     public virtual void Configure(EntityTypeBuilder<TEntity> builder)
     {
@@ -19,7 +19,6 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
         builder.HasKey(e => e.ID).HasName($"pk_{entityName}");
         builder.Property(e => e.ID)
             .HasColumnName(SimpleAPIContext.ID)
-            .HasConversion<EntityIDConverter<TEntityID>>()
             .ValueGeneratedOnAdd()
             .HasColumnOrder(-20);
 
@@ -42,10 +41,4 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
             builder.Property(property).HasColumnName(property.ToSnakeCase());
         }
     }
-}
-
-// TODO Check if we can skip this with a more generic class (generators)
-public class EntityIDConverter<TEntityID> : ValueConverter<TEntityID, int> where TEntityID : EntityID, new()
-{
-    public EntityIDConverter() : base(v => v.Value, v => new TEntityID { Value = v }) { }
 }

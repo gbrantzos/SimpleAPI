@@ -31,7 +31,7 @@ public static class DbContextExtensions
 
     public static async Task<int> PersistEntityAsync<TEntity, TEntityID>(this DbContext context, TEntity entity) 
         where TEntity : Entity<TEntityID>
-        where TEntityID : EntityID, new()
+        where TEntityID : IEntityID
     {
         context.Add(entity);
         await context.SaveChangesAsync();

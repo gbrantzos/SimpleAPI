@@ -5,7 +5,7 @@ public abstract class Entity
     public int RowVersion { get; set; } // TODO Move to an interface
 }
 
-public abstract class Entity<TEntityID> : Entity where TEntityID : EntityID, new()
+public abstract class Entity<TEntityID> : Entity where TEntityID : IEntityID
 {
     public TEntityID? ID { get; init; }
 
