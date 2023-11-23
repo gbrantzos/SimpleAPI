@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleAPI.Core;
 using SimpleAPI.Domain.Base;
+// ReSharper disable StaticMemberInGenericType
 
 namespace SimpleAPI.Infrastructure.Persistence.Base;
 
@@ -10,6 +11,7 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
     where TEntityID : IEntityID
 {
     private readonly Type _idConversion;
+    private static readonly string[] PropertiesToSkip = new string[] { "ID", "IsNew", "RowVersion" };
 
     protected EntityTypeConfiguration(Type idConversion)
         => _idConversion = idConversion;
@@ -43,7 +45,7 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
         var properties = entityType
             .GetProperties()
             .Select(p => p.Name)
-            .Except(new string[] { "ID", "IsNew", "RowVersion" });
+            .Except(PropertiesToSkip);
         foreach (var property in properties)
         {
             builder.Property(property).HasColumnName(property.ToSnakeCase());
