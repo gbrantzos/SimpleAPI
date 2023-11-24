@@ -27,7 +27,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
     #endregion
 
     #region IEquatable interface
-    public bool Equals(ValueObject? other) => Equals((object?) other);
+    public virtual bool Equals(ValueObject? other) => Equals((object?) other);
     #endregion
 
     #region Equality operators

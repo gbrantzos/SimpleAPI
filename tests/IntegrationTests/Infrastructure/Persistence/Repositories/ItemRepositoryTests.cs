@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using SimpleAPI.Domain.Features.Common;
 using SimpleAPI.Domain.Features.Items;
 using SimpleAPI.Infrastructure.Persistence;
 using SimpleAPI.Infrastructure.Persistence.Repositories;
@@ -25,7 +26,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         var item = new Item
         {
             Code        = "Test.001",
-            Description = "Testing item persistence"
+            Description = "Testing item persistence",
+            Price       = 3.2
         };
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
@@ -53,16 +55,18 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             var item = new Item
             {
                 Code        = "Test.002",
-                Description = "Testing item persistence"
+                Description = "Testing item persistence",
+                Price       = Money.Create(4.6m, Currency.USD)
             };
             _database.Context.Add(item);
             await _database.Context.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
-            
+
             // Act
             var existing = await repository.GetByIDAsync(item.ID!) ??
                 throw new InvalidOperationException("Existing item is null");
             existing.Description = "This a changed description";
+            existing.Price       = Money.InEuro(12432.90m);
             await uow.SaveChangesAsync();
 
             // Assert
@@ -127,7 +131,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 new Item
                 {
                     Code        = "Code.005",
-                    Description = "Item 005"
+                    Description = "Item 005",
+                    Price       = Money.InEuro(23)
                 }
             };
             _database.Context.AddRange(items);
@@ -235,7 +240,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
             using (_database.Context.Database.BeginTransactionAsync())
             {
-                var sql = $"update `item` set `description`='New', `row_version`=`row_version` +1 where `id` = {existingItem.ID!.Value}";
+                var sql =
+                    $"update `item` set `description`='New', `row_version`=`row_version` +1 where `id` = {existingItem.ID!.Value}";
                 await _database.Context.Database.ExecuteSqlRawAsync(sql);
             }
 

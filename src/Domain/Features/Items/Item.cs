@@ -1,5 +1,6 @@
 using SimpleAPI.Core;
 using SimpleAPI.Domain.Base;
+using SimpleAPI.Domain.Features.Common;
 
 namespace SimpleAPI.Domain.Features.Items;
 
@@ -9,6 +10,7 @@ public class Item : Entity<ItemID>, IVersioned
     public int RowVersion { get; set; }
     public string Code { get; set; } = String.Empty;
     public string Description { get; set; } = String.Empty;
+    public Money Price { get; set; } = Money.InEuro(0);
 }
 
 [HasStronglyTypedID]

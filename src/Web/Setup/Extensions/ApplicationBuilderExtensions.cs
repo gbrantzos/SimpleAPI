@@ -18,13 +18,10 @@ public static class ApplicationBuilderExtensions
         builder.UseSerilogRequestLogging(options =>
         {
             var serilog = options.GetLevel;
-            options.GetLevel = (context, elapsed, ex) =>
-            {
-                if (ex is OperationCanceledException)
-                    return LogEventLevel.Verbose;
-                    
-                return serilog(context, elapsed, ex);
-            };
+            options.GetLevel = (context, elapsed, ex)
+                => ex is OperationCanceledException
+                    ? LogEventLevel.Verbose
+                    : serilog(context, elapsed, ex);
         });
         builder.UseHttpMetrics();
 
@@ -44,4 +41,3 @@ public static class ApplicationBuilderExtensions
     private static IApplicationBuilder UseRequestContext(this IApplicationBuilder builder)
         => builder.UseMiddleware<RequestContextMiddleware>();
 }
-

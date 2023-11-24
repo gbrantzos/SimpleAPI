@@ -11,10 +11,14 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
     where TEntityID : IEntityID
 {
     private readonly Type _idConversion;
-    private static readonly string[] PropertiesToSkip = new string[] { "ID", "IsNew", "RowVersion" };
+    private readonly IEnumerable<string> _skipProperties;
+    private static readonly string[] BasicProperties = new string[] { "ID", "IsNew", "RowVersion" };
 
-    protected EntityTypeConfiguration(Type idConversion)
-        => _idConversion = idConversion;
+    protected EntityTypeConfiguration(Type idConversion, IEnumerable<string>? skipProperties = null)
+    {
+        _idConversion   = idConversion.ThrowIfNull();
+        _skipProperties = skipProperties ?? Array.Empty<string>();
+    }
 
     public virtual void Configure(EntityTypeBuilder<TEntity> builder)
     {
@@ -42,10 +46,11 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
 
         builder.Ignore(e => e.IsNew);
 
+        var skipProperties = BasicProperties.Concat(_skipProperties);
         var properties = entityType
             .GetProperties()
             .Select(p => p.Name)
-            .Except(PropertiesToSkip);
+            .Except(skipProperties);
         foreach (var property in properties)
         {
             builder.Property(property).HasColumnName(property.ToSnakeCase());
