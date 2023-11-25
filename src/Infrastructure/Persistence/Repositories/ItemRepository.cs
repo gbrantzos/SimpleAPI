@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SimpleAPI.Domain.Features.Items;
 
 namespace SimpleAPI.Infrastructure.Persistence.Repositories;
@@ -18,7 +19,10 @@ public class ItemRepository : IItemRepository
 
     public async Task<Item?> GetByIDAsync(ItemID id, CancellationToken cancellationToken = default)
     {
-        var result = await _context.Items.FindAsync(new object[] { id }, cancellationToken);
+        var result = await _context
+            .Items
+            .Include(i => i.Tags)
+            .SingleOrDefaultAsync(i => i.ID == id, cancellationToken);
         return result;
     }
 

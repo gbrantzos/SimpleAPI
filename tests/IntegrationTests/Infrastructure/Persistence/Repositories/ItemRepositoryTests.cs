@@ -17,7 +17,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
     public ItemRepositoryTests(DatabaseFixture database) => _database = database;
 
     [Fact]
-    public async Task ShouldAddItem()
+    public async Task Should_add_item()
     {
         // Arrange
         var repository = new ItemRepository(_database.Context);
@@ -29,6 +29,9 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             Description = "Testing item persistence",
             Price       = 3.2
         };
+        item.AddTag(new Tag() { Name = "Testing 1" });
+        item.AddTag(new Tag() { Name = "Testing 2" });
+        item.AddTag(new Tag() { Name = "Testing 3" });
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
             {
@@ -37,14 +40,15 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 await uow.SaveChangesAsync();
 
                 // Assert
-                var actual = _database.Context.Items.Single(i => i.Code == item.Code);
+                _database.Context.ChangeTracker.Clear();
+                var actual = _database.Context.Items.Include(i => i.Tags).Single(i => i.Code == item.Code);
                 actual.Should().BeEquivalentTo(item);
             }
         );
     }
 
     [Fact]
-    public async Task ShouldUpdateItem()
+    public async Task Should_update_item()
     {
         // Arrange
         var repository = new ItemRepository(_database.Context);
@@ -76,7 +80,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
     }
 
     [Fact]
-    public async Task ShouldDeleteItem()
+    public async Task Should_delete_item()
     {
         // Arrange
         var repository = new ItemRepository(_database.Context);
@@ -104,7 +108,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
     }
 
     [Fact]
-    public async Task ShouldGetItemByID()
+    public async Task Should_get_item_by_ID()
     {
         // Arrange
         var repository = new ItemRepository(_database.Context);
@@ -151,7 +155,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
     }
 
     [Fact]
-    public async Task ShouldIncreaseRowVersion()
+    public async Task Should_increase_RowVersion()
     {
         // Arrange
         var repository = new ItemRepository(_database.Context);
@@ -178,7 +182,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
     }
 
     [Fact]
-    public async Task ShouldUpdateAuditProperties()
+    public async Task Should_update_Audit_properties()
     {
         var repository = new ItemRepository(_database.Context);
         var uow = new UnitOfWork(_database.Context);
@@ -218,7 +222,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
     }
 
     [Fact]
-    public async Task ShouldThrowConcurrencyException()
+    public async Task Should_throw_ConcurrencyException()
     {
         var repository = new ItemRepository(_database.Context);
         var uow = new UnitOfWork(_database.Context);
@@ -249,4 +253,72 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             await updateAction.Should().ThrowAsync<DbUpdateConcurrencyException>();
         });
     }
+
+    [Fact]
+    public async Task Should_add_details()
+    {
+        var repository = new ItemRepository(_database.Context);
+        var uow = new UnitOfWork(_database.Context);
+
+        await _database.Context.ExecuteAndRollbackAsync(async () =>
+        {
+            var item = new Item
+            {
+                Code        = "Test.732",
+                Description = "Testing item with tags"
+            };
+            repository.Add(item);
+            await uow.SaveChangesAsync();
+            _database.Context.ChangeTracker.Clear();
+
+            var existingItem = await repository.GetByIDAsync(item.ID) ??
+                throw new InvalidOperationException($"Could not find item with ID {item.ID}");
+            existingItem.AddTag(new Tag() { Name = "Tag 1"});
+            existingItem.AddTag(new Tag() { Name = "Tag 2"});
+            await uow.SaveChangesAsync();
+            _database.Context.ChangeTracker.Clear();
+
+            var actual = await repository.GetByIDAsync(item.ID);
+            actual.Should().NotBeNull();
+            actual.Should().BeEquivalentTo(existingItem);
+        });
+    }
+    
+    [Fact]
+    public async Task Should_delete_details()
+    {
+        var repository = new ItemRepository(_database.Context);
+        var uow = new UnitOfWork(_database.Context);
+
+        await _database.Context.ExecuteAndRollbackAsync(async () =>
+        {
+            var item = new Item
+            {
+                Code        = "Test.733",
+                Description = "Testing item with tags"
+            };
+            item.AddTag(new Tag() { Name = "ATag 1"});
+            item.AddTag(new Tag() { Name = "ATag 2"});
+            item.AddTag(new Tag() { Name = "ATag 3"});
+            item.AddTag(new Tag() { Name = "ATag 4"});
+            
+            repository.Add(item);
+            await uow.SaveChangesAsync();
+            _database.Context.ChangeTracker.Clear();
+
+            var existingItem = await repository.GetByIDAsync(item.ID) ??
+                throw new InvalidOperationException($"Could not find item with ID {item.ID}");
+            existingItem.RemoveTag(new Tag() { Name = "ATag 2"});
+            existingItem.RemoveTag(new Tag() { Name = "ATag 4"});
+            existingItem.RemoveTag(new Tag() { Name = "ATag 6"}); // This one should not be found, but causes no issues!
+
+            await uow.SaveChangesAsync();
+            _database.Context.ChangeTracker.Clear();
+
+            var actual = await repository.GetByIDAsync(item.ID);
+            actual.Should().NotBeNull();
+            actual.Should().BeEquivalentTo(existingItem);
+        });
+    }
+
 }

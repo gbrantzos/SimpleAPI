@@ -31,10 +31,10 @@ public class SimpleAPIContext : DbContext
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = new())
     {
-        var newOrAdded = ChangeTracker
+        var newOrModified = ChangeTracker
             .Entries()
             .Where(e => e is { Entity: Entity, State: EntityState.Added or EntityState.Modified });
-        foreach (var entry in newOrAdded)
+        foreach (var entry in newOrModified)
         {
             // Change created and updated timestamps
             if (entry.State == EntityState.Added)

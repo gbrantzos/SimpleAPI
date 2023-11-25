@@ -27,9 +27,9 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
 
         builder.HasMany(p => p.Tags)
             .WithOne()
+            .OnDelete(DeleteBehavior.Cascade)
             .HasForeignKey("item_id")
             .HasConstraintName("fk_tag_item_id__item_id")
-            .OnDelete(DeleteBehavior.ClientCascade)
             .HasRelatedTableIndexName("idx_tag__item_id");
             
         builder.Navigation(p => p.Tags).UsePropertyAccessMode(PropertyAccessMode.Field);
