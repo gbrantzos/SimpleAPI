@@ -161,4 +161,6 @@ dotnet_diagnostic.CA1062.severity = none
 
 # The following is mostly for libraries, we can safely skip
 dotnet_diagnostic.CA1724.severity = none
+
 dotnet_diagnostic.CA1867.severity = none
+dotnet_diagnostic.CA1861.severity = none
