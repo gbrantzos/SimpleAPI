@@ -8,7 +8,7 @@ namespace SimpleAPI.Infrastructure.Persistence.Configuration;
 
 public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
 {
-    public ItemEntityConfiguration() : base(typeof(ItemIDConverter), new[] { "Price" }) { }
+    public ItemEntityConfiguration() : base(typeof(ItemIDConverter)) { }
 
     public override void Configure(EntityTypeBuilder<Item> builder)
     {
@@ -24,6 +24,15 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
                 .HasPrecision(14, 4);
             priceBuilder.Property(a => a.Currency).HasColumnName("price_currency");
         });
+
+        builder.HasMany(p => p.Tags)
+            .WithOne()
+            .HasForeignKey("item_id")
+            .HasConstraintName("fk_tag_item_id__item_id")
+            .OnDelete(DeleteBehavior.ClientCascade)
+            .HasRelatedTableIndexName("idx_tag__item_id");
+            
+        builder.Navigation(p => p.Tags).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
 

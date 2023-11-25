@@ -59,5 +59,4 @@ public sealed class Result<TData, TError>
         HasErrors
             ? _error!
             : throw new InvalidOperationException("Result does not have errors.");
-
 }

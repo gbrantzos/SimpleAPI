@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleAPI.Core;
 using SimpleAPI.Domain.Base;
+
 // ReSharper disable StaticMemberInGenericType
 
 namespace SimpleAPI.Infrastructure.Persistence.Base;
@@ -49,6 +50,7 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
         var skipProperties = BasicProperties.Concat(_skipProperties);
         var properties = entityType
             .GetProperties()
+            .Where(p => p.PropertyType.IsPrimitive || p.PropertyType == typeof(string))
             .Select(p => p.Name)
             .Except(skipProperties);
         foreach (var property in properties)

@@ -23,10 +23,7 @@ public sealed class Error
             Details = new Dictionary<string, object?>(details);
         }
     }
-
-    public static Error Create(string message)
-        => new Error(ErrorKind.Generic, message);
-
+    
     public static Error Create(ErrorKind kind, string message)
         => new Error(kind, message);
 
