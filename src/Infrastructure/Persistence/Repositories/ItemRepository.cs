@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SimpleAPI.Core;
 using SimpleAPI.Domain.Features.Items;
 
 namespace SimpleAPI.Infrastructure.Persistence.Repositories;
@@ -9,12 +10,12 @@ public class ItemRepository : IItemRepository
 
     public ItemRepository(SimpleAPIContext context)
     {
-        _context = context;
+        _context = context.ThrowIfNull();
     }
 
-    public void Add(Item item)
+    public void Add(Item entity)
     {
-        _context.Items.Add(item);
+        _context.Items.Add(entity);
     }
 
     public async Task<Item?> GetByIDAsync(ItemID id, CancellationToken cancellationToken = default)
@@ -26,8 +27,8 @@ public class ItemRepository : IItemRepository
         return result;
     }
 
-    public void Delete(Item item)
+    public void Delete(Item entity)
     {
-        _context.Items.Remove(item);
+        _context.Items.Remove(entity);
     }
 }

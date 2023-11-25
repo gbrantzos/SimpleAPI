@@ -22,7 +22,8 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
             priceBuilder.Property(a => a.Amount)
                 .HasColumnName("price_amount")
                 .HasPrecision(14, 4);
-            priceBuilder.Property(a => a.Currency).HasColumnName("price_currency");
+            priceBuilder.Property(a => a.Currency)
+                .HasColumnName("price_currency");
         });
 
         builder.HasMany(p => p.Tags)
@@ -31,7 +32,7 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
             .HasForeignKey("item_id")
             .HasConstraintName("fk_tag_item_id__item_id")
             .HasRelatedTableIndexName("idx_tag__item_id");
-            
+
         builder.Navigation(p => p.Tags).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
