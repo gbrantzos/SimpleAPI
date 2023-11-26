@@ -18,7 +18,7 @@ public class DeleteItemHandler : Handler<DeleteItemCommand, bool>
         _unitOfWork = unitOfWork.ThrowIfNull();
     }
 
-    public override async Task<Result<bool, Error>> Handle(DeleteItemCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<bool>> Handle(DeleteItemCommand request, CancellationToken cancellationToken)
     {
         Ensure.NotNull(request);
         

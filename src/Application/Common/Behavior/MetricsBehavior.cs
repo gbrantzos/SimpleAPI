@@ -6,10 +6,10 @@ using SimpleAPI.Core.Base;
 
 namespace SimpleAPI.Application.Common.Behavior;
 
-public class MetricsBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, Result<TResponse, Error>>
+public class MetricsBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, Result<TResponse>>
     where TRequest : Request<TResponse>
 {
-    public async Task<Result<TResponse, Error>> Handle(TRequest request, RequestHandlerDelegate<Result<TResponse, Error>> next,
+    public async Task<Result<TResponse>> Handle(TRequest request, RequestHandlerDelegate<Result<TResponse>> next,
         CancellationToken cancellationToken)
     {
         var sw = new Stopwatch();

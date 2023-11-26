@@ -7,7 +7,7 @@ using SimpleAPI.Core.Base;
 
 namespace SimpleAPI.Application.Common.Behavior;
 
-public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, Result<TResponse, Error>>
+public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, Result<TResponse>>
     where TRequest : Request<TResponse>
 {
     private readonly ILogger _logger;
@@ -15,7 +15,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
     public LoggingBehavior(ILoggerFactory loggerFactory)
         => _logger = loggerFactory.CreateLogger<LoggingBehavior<TRequest, TResponse>>();
 
-    public async Task<Result<TResponse, Error>> Handle(TRequest request, RequestHandlerDelegate<Result<TResponse, Error>> next,
+    public async Task<Result<TResponse>> Handle(TRequest request, RequestHandlerDelegate<Result<TResponse>> next,
         CancellationToken cancellationToken)
     {
         var requestType = typeof(TRequest).Name;
@@ -29,7 +29,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
             sw.Start();
             var response = await next();
             sw.Stop();
-            var result = (Result<TResponse, Error>)response;
+            var result = (Result<TResponse>)response;
             result.Match(
                 _ => _logger.LogInformation("[{RequestType}] => {Request} executed successfully ({ElapsedMs}ms)",
                     requestType,

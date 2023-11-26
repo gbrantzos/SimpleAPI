@@ -1,13 +1,13 @@
 namespace SimpleAPI.Core.Base;
 
-public sealed class Result<TData, TError>
+public sealed class Result<TData>
 {
     private readonly TData? _data;
-    private readonly TError? _error;
+    private readonly Error? _error;
 
     public bool HasErrors { get; }
 
-    private Result(TData? data, TError? error = default, bool hasErrors = false)
+    private Result(TData? data, Error? error = default, bool hasErrors = false)
     {
         if (hasErrors)
         {
@@ -26,11 +26,11 @@ public sealed class Result<TData, TError>
     }
 
     #pragma warning disable CA2225
-    public static implicit operator Result<TData, TError>(TData data) => new(data);
-    public static implicit operator Result<TData, TError>(TError error) => new(default, error, true);
+    public static implicit operator Result<TData>(TData data) => new(data);
+    public static implicit operator Result<TData>(Error error) => new(default, error, true);
     #pragma warning restore CA2225
     
-    public T Match<T>(Func<TData, T> dataFunc, Func<TError, T> errorFunc)
+    public T Match<T>(Func<TData, T> dataFunc, Func<Error, T> errorFunc)
     {
         ArgumentNullException.ThrowIfNull(dataFunc);
         ArgumentNullException.ThrowIfNull(errorFunc);
@@ -40,7 +40,7 @@ public sealed class Result<TData, TError>
             : dataFunc(_data ?? throw new ArgumentException(nameof(_data)));
     }
 
-    public void Match(Action<TData> dataAction, Action<TError> errorAction)
+    public void Match(Action<TData> dataAction, Action<Error> errorAction)
     {
         ArgumentNullException.ThrowIfNull(dataAction);
         ArgumentNullException.ThrowIfNull(errorAction);
@@ -55,7 +55,7 @@ public sealed class Result<TData, TError>
             ? throw new InvalidOperationException("Result has errors.")
             : _data!;
 
-    public TError Error =>
+    public Error Error =>
         HasErrors
             ? _error!
             : throw new InvalidOperationException("Result does not have errors.");

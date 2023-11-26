@@ -16,7 +16,7 @@ public class GetItemHandler : Handler<GetItemCommand, ItemViewModel>
         _repository = repository.ThrowIfNull();
     }
 
-    public override async Task<Result<ItemViewModel, Error>> Handle(GetItemCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<ItemViewModel>> Handle(GetItemCommand request, CancellationToken cancellationToken)
     {
         Ensure.NotNull(request);
 

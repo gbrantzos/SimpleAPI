@@ -42,8 +42,8 @@ public class LoggingBehaviorTests
         var behavior = new LoggingBehavior<SimpleRequest, SimpleResponse>(_loggerFactory.Object);
         var request = new SimpleRequest();
         var cToken = CancellationToken.None;
-        RequestHandlerDelegate<Result<SimpleResponse, Error>> next = () =>
-            Task.FromResult<Result<SimpleResponse, Error>>(new SimpleResponse());
+        RequestHandlerDelegate<Result<SimpleResponse>> next = () =>
+            Task.FromResult<Result<SimpleResponse>>(new SimpleResponse());
 
         // Act
         await behavior.Handle(request, next, cToken);
@@ -66,8 +66,8 @@ public class LoggingBehaviorTests
         var behavior = new LoggingBehavior<SimpleRequest, SimpleResponse>(_loggerFactory.Object);
         var request = new SimpleRequest();
         var cToken = CancellationToken.None;
-        RequestHandlerDelegate<Result<SimpleResponse, Error>> next = () =>
-            Task.FromResult<Result<SimpleResponse, Error>>(Error.Create(ErrorKind.Generic, "Generic error"));
+        RequestHandlerDelegate<Result<SimpleResponse>> next = () =>
+            Task.FromResult<Result<SimpleResponse>>(Error.Create(ErrorKind.Generic, "Generic error"));
 
         // Act
         await behavior.Handle(request, next, cToken);
@@ -90,7 +90,7 @@ public class LoggingBehaviorTests
         var behavior = new LoggingBehavior<SimpleRequest, SimpleResponse>(_loggerFactory.Object);
         var request = new SimpleRequest();
         var cToken = CancellationToken.None;
-        RequestHandlerDelegate<Result<SimpleResponse, Error>> next = () =>
+        RequestHandlerDelegate<Result<SimpleResponse>> next = () =>
             throw new OperationCanceledException("Cancel");
 
         // Act
@@ -115,7 +115,7 @@ public class LoggingBehaviorTests
         var behavior = new LoggingBehavior<SimpleRequest, SimpleResponse>(_loggerFactory.Object);
         var request = new SimpleRequest();
         var cToken = CancellationToken.None;
-        RequestHandlerDelegate<Result<SimpleResponse, Error>> next = () =>
+        RequestHandlerDelegate<Result<SimpleResponse>> next = () =>
             throw new Exception("Unhandled exception");
 
         // Act

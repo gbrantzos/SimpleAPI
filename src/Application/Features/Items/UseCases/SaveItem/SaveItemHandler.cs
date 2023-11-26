@@ -20,7 +20,7 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
         _unitOfWork     = unitOfWork.ThrowIfNull();
     }
 
-    public override async Task<Result<ItemViewModel, Error>> Handle(SaveItemCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<ItemViewModel>> Handle(SaveItemCommand request, CancellationToken cancellationToken)
     {
         Ensure.NotNull(request);
         

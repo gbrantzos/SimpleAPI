@@ -5,7 +5,7 @@ using SimpleAPI.Core.Base;
 
 namespace SimpleAPI.Application.Common.Behavior;
 
-public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, Result<TResponse, Error>>
+public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, Result<TResponse>>
     where TRequest : Request<TResponse>
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
@@ -13,8 +13,8 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
     public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
         => _validators = validators;
 
-    public async Task<Result<TResponse, Error>> Handle(TRequest request,
-        RequestHandlerDelegate<Result<TResponse, Error>> next,
+    public async Task<Result<TResponse>> Handle(TRequest request,
+        RequestHandlerDelegate<Result<TResponse>> next,
         CancellationToken cancellationToken)
     {
         if (!_validators.Any())

@@ -29,9 +29,9 @@ public class ValidationBehaviorTests
         var behavior = new ValidationBehavior<SimpleRequest, SimpleResponse>(validators);
         var request = new SimpleRequest();
         var cToken = CancellationToken.None;
-        var next = new Mock<RequestHandlerDelegate<Result<SimpleResponse, Error>>>();
+        var next = new Mock<RequestHandlerDelegate<Result<SimpleResponse>>>();
         next.Setup(m => m.Invoke())
-            .Returns(Task.FromResult<Result<SimpleResponse, Error>>(new SimpleResponse()))
+            .Returns(Task.FromResult<Result<SimpleResponse>>(new SimpleResponse()))
             .Verifiable();
 
         // Act
@@ -68,9 +68,9 @@ public class ValidationBehaviorTests
         var behavior = new ValidationBehavior<SimpleRequest, SimpleResponse>(validators);
         var request = new SimpleRequest();
         var cToken = CancellationToken.None;
-        var next = new Mock<RequestHandlerDelegate<Result<SimpleResponse, Error>>>();
+        var next = new Mock<RequestHandlerDelegate<Result<SimpleResponse>>>();
         next.Setup(m => m.Invoke())
-            .Returns(Task.FromResult<Result<SimpleResponse, Error>>(new SimpleResponse()))
+            .Returns(Task.FromResult<Result<SimpleResponse>>(new SimpleResponse()))
             .Verifiable();
 
         // Act
