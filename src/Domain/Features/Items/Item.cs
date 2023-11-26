@@ -39,7 +39,9 @@ public class Item : Entity<ItemID>, IVersioned
 [HasStronglyTypedID]
 public class Tag : Entity<TagID>
 {
-    public string Name { get; set; } = String.Empty;
+    public Tag(string name) => Name = name;
+    
+    public string Name { get; init; }
 
     public override string ToString() => $"{Name} [ID {ID}]";
 }

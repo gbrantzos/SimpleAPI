@@ -4,6 +4,7 @@ using SimpleAPI.Application.Features.Items.ViewModels;
 using SimpleAPI.Core;
 using SimpleAPI.Core.Base;
 using SimpleAPI.Core.Guards;
+using SimpleAPI.Domain.Features.Common;
 using SimpleAPI.Domain.Features.Items;
 
 namespace SimpleAPI.Application.Features.Items.UseCases.SaveItem;
@@ -38,6 +39,7 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
 
         item.Code        = request.ViewModel.Code;
         item.Description = request.ViewModel.Description;
+        item.Price       = Money.InEuro(request.ViewModel.Price);
 
         if (isNew)
         {

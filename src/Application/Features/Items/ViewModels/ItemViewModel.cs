@@ -7,6 +7,7 @@ public class ItemViewModel : ViewModel
 {
     public string Code { get; set; } = String.Empty;
     public string Description { get; set; } = String.Empty;
+    public decimal Price { get; set; }
 }
 
 public static class ItemViewModelExtensions
@@ -17,6 +18,7 @@ public static class ItemViewModelExtensions
             ID          = item.ID.Value,
             RowVersion  = item.RowVersion,
             Code        = item.Code,
-            Description = item.Description
+            Description = item.Description,
+            Price       = item.Price.Amount
         };
 }

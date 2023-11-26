@@ -37,7 +37,8 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
         var json = """
                    {
                      "code": "287",
-                     "description": "Testing 287"
+                     "description": "Testing 287",
+                     "price": 3.15
                    }
                    """;
 

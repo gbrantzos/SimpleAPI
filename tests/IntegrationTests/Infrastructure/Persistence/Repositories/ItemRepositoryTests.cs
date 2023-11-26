@@ -29,9 +29,9 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             Description = "Testing item persistence",
             Price       = 3.2
         };
-        item.AddTag(new Tag() { Name = "Testing 1" });
-        item.AddTag(new Tag() { Name = "Testing 2" });
-        item.AddTag(new Tag() { Name = "Testing 3" });
+        item.AddTag(new Tag("Testing 1"));
+        item.AddTag(new Tag("Testing 2"));
+        item.AddTag(new Tag("Testing 3"));
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
             {
@@ -273,8 +273,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
             var existingItem = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
-            existingItem.AddTag(new Tag() { Name = "Tag 1"});
-            existingItem.AddTag(new Tag() { Name = "Tag 2"});
+            existingItem.AddTag(new Tag("Tag 1"));
+            existingItem.AddTag(new Tag("Tag 2"));
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
@@ -283,7 +283,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             actual.Should().BeEquivalentTo(existingItem);
         });
     }
-    
+
     [Fact]
     public async Task Should_delete_details()
     {
@@ -297,20 +297,20 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 Code        = "Test.733",
                 Description = "Testing item with tags"
             };
-            item.AddTag(new Tag() { Name = "ATag 1"});
-            item.AddTag(new Tag() { Name = "ATag 2"});
-            item.AddTag(new Tag() { Name = "ATag 3"});
-            item.AddTag(new Tag() { Name = "ATag 4"});
-            
+            item.AddTag(new Tag("ATag 1"));
+            item.AddTag(new Tag("ATag 2"));
+            item.AddTag(new Tag("ATag 3"));
+            item.AddTag(new Tag("ATag 4"));
+
             repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
             var existingItem = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
-            existingItem.RemoveTag(new Tag() { Name = "ATag 2"});
-            existingItem.RemoveTag(new Tag() { Name = "ATag 4"});
-            existingItem.RemoveTag(new Tag() { Name = "ATag 6"}); // This one should not be found, but causes no issues!
+            existingItem.RemoveTag(new Tag("ATag 2"));
+            existingItem.RemoveTag(new Tag("ATag 4"));
+            existingItem.RemoveTag(new Tag("ATag 6")); // This one should not be found, but causes no issues!
 
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
