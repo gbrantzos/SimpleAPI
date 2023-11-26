@@ -3,9 +3,9 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAPI.Application.Features.Items.ViewModels;
-using SimpleAPI.IntegrationTests.Setup;
+using SimpleAPI.FunctionalTests.Setup;
 
-namespace SimpleAPI.IntegrationTests.Web.Endpoints;
+namespace SimpleAPI.FunctionalTests.Web.Endpoints;
 
 // > Test cases
 //
@@ -13,6 +13,7 @@ namespace SimpleAPI.IntegrationTests.Web.Endpoints;
 // - POST invalid item should return Bad Request
 // - GET existing item should return OK
 // - GET non existing item should return Not Found
+// - GET using malformed id should return Bad Request
 // - PUT existing item should return OK
 // - PUT invalid existing item should return Bad Request
 // - PUT existing item with different row version should return Conflict
@@ -128,6 +129,16 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
         problem.Detail.Should().Be("Entity with ID 987 not found");
     }
 
+    [Fact]
+    public async Task GET_using_malformed_id_should_return_Bad_Request()
+    {
+        // Act
+        var response = await _client.GetAsync("/items/abc");
+
+        // Assert
+        response.ShouldReturn(HttpStatusCode.BadRequest, "application/problem+json");
+    }
+    
     [Fact]
     public async Task PUT_existing_item_should_return_OK()
     {

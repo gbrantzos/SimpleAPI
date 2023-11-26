@@ -62,7 +62,7 @@ public class ErrorMapper
             _ => throw new ArgumentOutOfRangeException(nameof(errorKind), errorKind, null)
         };
     }
-    
+
     public static void CustomizeProblemDetails(ProblemDetailsContext context)
     {
         var requestContextProvider = context.HttpContext.RequestServices.GetRequiredService<RequestContextProvider>();
@@ -83,6 +83,7 @@ public class ErrorMapper
             var exceptionDto = new ExceptionObject(exception);
 
             context.ProblemDetails.Detail = exceptionDto.Message;
+            context.ProblemDetails.Extensions.Add("exceptionType", exceptionDto.ExceptionType);
             if (hostingEnvironment.IsDevelopment())
             {
                 context.ProblemDetails.Extensions.Add("exception", exceptionDto);

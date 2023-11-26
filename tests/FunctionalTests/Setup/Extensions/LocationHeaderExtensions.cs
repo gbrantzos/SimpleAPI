@@ -1,4 +1,4 @@
-namespace SimpleAPI.IntegrationTests.Setup;
+namespace SimpleAPI.FunctionalTests.Setup;
 
 public static class LocationHeaderExtensions
 {

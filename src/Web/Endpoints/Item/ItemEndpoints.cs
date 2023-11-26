@@ -21,7 +21,7 @@ public class ItemEndpoints : IEndpointMapper
             .WithTags("Items")
             .WithOpenApi();
 
-        group.MapGet("{id:int}", GetItem.Handle)
+        group.MapGet("{id}", GetItem.Handle)
             .WithName("GetItem")
             .WithSummary("Get item by ID")
             .WithDescription("Retrieve an item by its ID.");

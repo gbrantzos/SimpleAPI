@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace SimpleAPI.IntegrationTests.Setup;
+namespace SimpleAPI.FunctionalTests.Setup;
 
 public static class HttpClientExtensions
 {   
@@ -41,4 +41,5 @@ public static class HttpClientExtensions
 
         return location.GetID();
     }
+    
 }

@@ -23,11 +23,7 @@ public class Item : Entity<ItemID>, IVersioned
         if (existing is null)
         {
             _tags.Add(tag);
-            return;
         }
-
-        // Tag exists, do whatever you like (update maybe??)
-        existing.Name = tag.Name;
     }
 
     public void RemoveTag(Tag tag)

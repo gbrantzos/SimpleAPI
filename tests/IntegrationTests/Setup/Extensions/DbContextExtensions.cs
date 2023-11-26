@@ -28,13 +28,4 @@ public static class DbContextExtensions
             context.ChangeTracker.Clear();
         });
     }
-
-    public static async Task<int> PersistEntityAsync<TEntity, TEntityID>(this DbContext context, TEntity entity) 
-        where TEntity : Entity<TEntityID>
-        where TEntityID : IEntityID
-    {
-        context.Add(entity);
-        await context.SaveChangesAsync();
-        return entity.ID?.Value ?? 0;
-    }
 }

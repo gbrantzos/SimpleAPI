@@ -1,6 +1,6 @@
-using SimpleAPI.IntegrationTests.Setup;
+using SimpleAPI.FunctionalTests.Setup;
 
-namespace SimpleAPI.IntegrationTests.Web.Endpoints;
+namespace SimpleAPI.FunctionalTests.Web.Endpoints;
 
 public class CommonEndpointsTests : IClassFixture<SimpleAPIFactory>
 {

@@ -9,7 +9,7 @@ public interface IRepository<TEntity, in TEntityID>
     /// </summary>
     /// <param name="id">ID value (entity PK)</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns></returns>
+    /// <returns>The requested entity or null if no entity found</returns>
     Task<TEntity?> GetByIDAsync(TEntityID id, CancellationToken cancellationToken = default);
 
     /// <summary>

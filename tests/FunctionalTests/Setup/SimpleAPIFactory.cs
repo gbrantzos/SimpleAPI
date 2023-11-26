@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using SimpleAPI.Application.Common;
 using SimpleAPI.Infrastructure.Persistence;
 
-namespace SimpleAPI.IntegrationTests.Setup;
+namespace SimpleAPI.FunctionalTests.Setup;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class SimpleAPIFactory : WebApplicationFactory<Program>
