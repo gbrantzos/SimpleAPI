@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleAPI.Domain.Features.Items;
 using SimpleAPI.Infrastructure.Persistence.Base;
 
@@ -37,11 +36,3 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
     }
 }
 
-// TODO Check if we can skip this with a more generic class (generators)
-public class ItemIDConverter : ValueConverter<ItemID, int>
-{
-    public ItemIDConverter() : base(
-        v => v.Value,
-        v => new ItemID(v)
-    ) { }
-}

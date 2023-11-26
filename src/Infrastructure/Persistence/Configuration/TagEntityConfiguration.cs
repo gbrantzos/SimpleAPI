@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleAPI.Domain.Features.Items;
 using SimpleAPI.Infrastructure.Persistence.Base;
 
@@ -22,12 +21,4 @@ public class TagEntityConfiguration : EntityTypeConfiguration<Tag, TagID>
         builder.HasKey(new[] { "ID", "item_id" });
         base.Configure(builder);
     }
-}
-
-public class TagIDConverter : ValueConverter<TagID, int>
-{
-    public TagIDConverter() : base(
-        v => v.Value,
-        v => new TagID(v)
-    ) { }
 }

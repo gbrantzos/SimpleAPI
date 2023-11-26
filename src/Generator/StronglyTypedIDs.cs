@@ -51,8 +51,8 @@ public class StronglyTypedIDs : IIncrementalGenerator
             var stronglyTypedID = PrepareStronglyTypedID(symbolName, symbolNamespace.ToString());
             context.AddSource($"SimpleAPI.{symbolName}.TypedID.g.cs", stronglyTypedID);
 
-            // var typeIDConversion = PrepareTypeIDConversion(symbolName, symbolNamespace.ToString());
-            // context.AddSource($"SimpleAPI.{symbolName}.EntityConversion.g.cs", typeIDConversion);
+            var typeIDConversion = PrepareTypeIDConversion(symbolName, symbolNamespace.ToString());
+            context.AddSource($"SimpleAPI.{symbolName}.EntityConversion.g.cs", typeIDConversion);
         }
     }
 
@@ -69,7 +69,7 @@ public class StronglyTypedIDs : IIncrementalGenerator
                  // </auto-generated>
                  //------------------------------------------------------------------------------
                  #nullable enable
-                 
+
                  using SimpleAPI.Domain.Base;
 
                  namespace {{symbolNamespace}};

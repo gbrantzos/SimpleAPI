@@ -6,7 +6,7 @@ namespace SimpleAPI.UnitTests.Generator;
 
 public static class GeneratorTestsHelper
 {
-    public static string GetGeneratedOutput(string sourceCode)
+    public static IReadOnlyList<string> GetGeneratedOutput(string sourceCode)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
 
@@ -29,6 +29,6 @@ public static class GeneratorTestsHelper
                 out var diagnostics
             );
 
-        return outputCompilation.SyntaxTrees.Skip(1).LastOrDefault()?.ToString() ?? "Empty!!";
+        return outputCompilation.SyntaxTrees.Skip(1).Select(s => s.ToString()).ToList();
     }
 }
