@@ -26,7 +26,7 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
         
         var isNew = request.ItemID == 0;
         var item = isNew
-            ? new Item()
+            ? Item.Create(request.ViewModel.Code, request.ViewModel.Description)
             : await _itemRepository.GetByIDAsync(new ItemID(request.ItemID), cancellationToken);
         if (item is null)
         {
@@ -37,9 +37,8 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
             return Error.Create(ErrorKind.ModifiedEntry, $"Entity already modified");
         }
 
-        item.Code        = request.ViewModel.Code;
         item.Description = request.ViewModel.Description;
-        item.Price       = Money.InEuro(request.ViewModel.Price);
+        item.SetPrice(Money.InEuro(request.ViewModel.Price));
 
         if (isNew)
         {

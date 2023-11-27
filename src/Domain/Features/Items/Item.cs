@@ -10,13 +10,27 @@ public class Item : Entity<ItemID>, IVersioned
     private readonly List<Tag> _tags = new List<Tag>();
 
     public int RowVersion { get; set; }
-    public string Code { get; set; } = String.Empty;
-    public string Description { get; set; } = String.Empty;
-    public Money Price { get; set; } = Money.InEuro(0);
+    public string Code { get; private set; }
+    public string Description { get; set; }
+    public Money Price { get; private set; } = Money.InEuro(0);
     public IReadOnlyCollection<Tag> Tags => _tags.AsReadOnly();
+
+    private Item(string code, string description)
+    {
+        Code        = code;
+        Description = description;
+    }
+    
+    public static Item Create(string code, string description)
+    {
+        var newItem = new Item(code, description);
+        return newItem;
+    }
 
     public override string ToString() => $"Item with ID {ID}";
 
+    public void SetPrice(Money price) => Price = price;
+    
     public void AddTag(Tag tag)
     {
         var existing = _tags.FirstOrDefault(t => t.Name == tag.Name);

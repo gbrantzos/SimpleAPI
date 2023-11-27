@@ -19,12 +19,7 @@ public class GetItemHandlerTests
         var mockRepo = _mockRepository.Create<IItemRepository>();
         var cancellationToken = CancellationToken.None;
 
-        var existing = new Item()
-        {
-            ID          = new ItemID(12),
-            Code        = "Test.123",
-            Description = "Testing Item"
-        };
+        var existing = Item.Create("Test.123", "Testing Item");
         mockRepo.Setup(m => m.GetByIDAsync(new ItemID(12), cancellationToken))
             .ReturnsAsync(existing);
 

@@ -1,7 +1,7 @@
 using System.Net;
 using FluentAssertions;
 
-namespace SimpleAPI.FunctionalTests.Web.Endpoints;
+namespace SimpleAPI.FunctionalTests.Setup;
 
 public static class AssertionExtensions
 {

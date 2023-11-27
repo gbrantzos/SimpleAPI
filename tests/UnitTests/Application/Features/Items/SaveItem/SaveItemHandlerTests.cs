@@ -62,13 +62,9 @@ public class SaveItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
-        var existingItem = new Item
-        {
-            ID          = new ItemID(4),
-            RowVersion  = 3,
-            Code        = "Code",
-            Description = "Valid item"
-        };
+        var existingItem = Item.Create("Code", "Valid item");
+        existingItem.RowVersion = 3;
+
         mockRepo.Setup(m => m.GetByIDAsync(It.Is<ItemID>(i => i == new ItemID(4)), cancellationToken))
             .ReturnsAsync(existingItem);
         mockUnitOfWork.Setup(m => m.SaveChangesAsync(cancellationToken))
@@ -86,7 +82,9 @@ public class SaveItemHandlerTests
             ID          = 4,
             Code        = "Code",
             Description = "Valid Item"
-        }, opt => opt.Excluding(i => i.RowVersion));
+        }, opt => opt
+            .Excluding(i => i.RowVersion)
+            .Excluding(i => i.ID));
 
         _mockRepository.VerifyAll();
     }
@@ -137,12 +135,10 @@ public class SaveItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
-        var existing = new Item()
-        {
-            RowVersion = 5
-        };
+        var existingItem = Item.Create("Code", "Description");
+        existingItem.RowVersion = 5;
         mockRepo.Setup(m => m.GetByIDAsync(It.Is<ItemID>(i => i == new ItemID(14)), cancellationToken))
-            .ReturnsAsync(existing);
+            .ReturnsAsync(existingItem);
 
         // Act
         var handler = new SaveItemHandler(mockRepo.Object, mockUnitOfWork.Object);

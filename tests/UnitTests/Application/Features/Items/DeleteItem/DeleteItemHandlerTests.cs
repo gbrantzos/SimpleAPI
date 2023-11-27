@@ -20,13 +20,9 @@ public class DeleteItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
-        var existing = new Item()
-        {
-            ID          = new ItemID(12),
-            RowVersion  = 7,
-            Code        = "Test.123",
-            Description = "Testing Item"
-        };
+        var existing = Item.Create("Test.123", "testingItem");
+        existing.RowVersion = 7;
+        
         mockRepo.Setup(m => m.GetByIDAsync(new ItemID(12), cancellationToken))
             .ReturnsAsync(existing);
         mockRepo.Setup(m => m.Delete(existing));
@@ -78,10 +74,8 @@ public class DeleteItemHandlerTests
         var mockUnitOfWork = _mockRepository.Create<IUnitOfWork>();
         var cancellationToken = CancellationToken.None;
 
-        var existingItem = new Item()
-        {
-            RowVersion = 4
-        };
+        var existingItem = Item.Create("Code", "Description");
+        existingItem.RowVersion = 4;
         mockRepo.Setup(m => m.GetByIDAsync(new ItemID(12), cancellationToken))
             .ReturnsAsync(existingItem);
 

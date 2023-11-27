@@ -23,12 +23,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         var repository = new ItemRepository(_database.Context);
         var uow = new UnitOfWork(_database.Context);
 
-        var item = new Item
-        {
-            Code        = "Test.001",
-            Description = "Testing item persistence",
-            Price       = 3.2
-        };
+        var item = Item.Create("Test.001", "Testing item persistence");
+        item.SetPrice(3.2);
         item.AddTag(new Tag("Testing 1"));
         item.AddTag(new Tag("Testing 2"));
         item.AddTag(new Tag("Testing 3"));
@@ -56,21 +52,16 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
-            var item = new Item
-            {
-                Code        = "Test.002",
-                Description = "Testing item persistence",
-                Price       = Money.Create(4.6m, Currency.USD)
-            };
+            var item = Item.Create("Test.002", "Testing item persistence");
             _database.Context.Add(item);
             await _database.Context.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
             // Act
-            var existing = await repository.GetByIDAsync(item.ID!) ??
+            var existing = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException("Existing item is null");
             existing.Description = "This a changed description";
-            existing.Price       = Money.InEuro(12432.90m);
+            existing.SetPrice(Money.InEuro(12432.90m));
             await uow.SaveChangesAsync();
 
             // Assert
@@ -88,11 +79,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
-            var item = new Item
-            {
-                Code        = "Test.003",
-                Description = "Testing item persistence"
-            };
+            var item = Item.Create("Test.003", "Testing item persistence");
             repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
@@ -117,28 +104,13 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         {
             var items = new List<Item>
             {
-                new Item
-                {
-                    Code        = "Code.001",
-                    Description = "Item 001"
-                },
-                new Item
-                {
-                    Code        = "Code.002",
-                    Description = "Item 003"
-                },
-                new Item
-                {
-                    Code        = "Code.004",
-                    Description = "Item 004"
-                },
-                new Item
-                {
-                    Code        = "Code.005",
-                    Description = "Item 005",
-                    Price       = Money.InEuro(23)
-                }
+                Item.Create("Code.001", "Item 001"),
+                Item.Create("Code.002", "Item 002"),
+                Item.Create("Code.003", "Item 003"),
+                Item.Create("Code.004", "Item 004"),
+                Item.Create("Code.005", "Item 005")
             };
+            items[4].SetPrice(Money.InEuro(23));
             _database.Context.AddRange(items);
             await _database.Context.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
@@ -146,7 +118,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             var expected = items.Last();
 
             // Act 
-            var actual = await repository.GetByIDAsync(expected.ID!);
+            var actual = await repository.GetByIDAsync(expected.ID);
 
             // Assert
             actual.Should().NotBeNull();
@@ -161,11 +133,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         var repository = new ItemRepository(_database.Context);
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
-            var item = new Item
-            {
-                Code        = "Test.032",
-                Description = "Testing item persistence"
-            };
+            var item = Item.Create("Test.032", "Testing item persistence");
             item.RowVersion.Should().Be(0);
 
             // Act
@@ -175,7 +143,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             // Assert
             item.RowVersion.Should().Be(1);
             _database.Context.ChangeTracker.Clear();
-            var existing = await repository.GetByIDAsync(item.ID!) ??
+            var existing = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException("Existing item is null");
             existing.RowVersion.Should().Be(item.RowVersion);
         });
@@ -189,12 +157,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
-            var item = new Item
-            {
-                Code        = "Test.032",
-                Description = "Testing item persistence"
-            };
-
+            var item = Item.Create("Test.032", "Testing item persistence");
             var dt1 = DateTime.Now;
             _database.TimeProviderMock.Setup(m => m.GetNow()).Returns(dt1);
 
@@ -202,7 +165,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
-            var existingItem = await repository.GetByIDAsync(item.ID!) ??
+            var existingItem = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             _database.Context.Entry(existingItem).Property(SimpleAPIContext.CreatedAt).CurrentValue.Should().Be(dt1);
             _database.Context.Entry(existingItem).Property(SimpleAPIContext.ModifiedAt).CurrentValue.Should().Be(dt1);
@@ -214,7 +177,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
-            var modifiedItem = await repository.GetByIDAsync(item.ID!) ??
+            var modifiedItem = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             _database.Context.Entry(modifiedItem).Property(SimpleAPIContext.CreatedAt).CurrentValue.Should().Be(dt1);
             _database.Context.Entry(modifiedItem).Property(SimpleAPIContext.ModifiedAt).CurrentValue.Should().Be(dt2);
@@ -229,23 +192,19 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
-            var item = new Item
-            {
-                Code        = "Test.032",
-                Description = "Testing item persistence"
-            };
+            var item = Item.Create("Test.035", "Testing item persistence");
             repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
-            var existingItem = await repository.GetByIDAsync(item.ID!) ??
+            var existingItem = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             existingItem.Description = "Modified description";
 
             using (_database.Context.Database.BeginTransactionAsync())
             {
                 var sql =
-                    $"update `item` set `description`='New', `row_version`=`row_version` +1 where `id` = {existingItem.ID!.Value}";
+                    $"update `item` set `description`='New', `row_version`=`row_version` +1 where `id` = {existingItem.ID.Value}";
                 await _database.Context.Database.ExecuteSqlRawAsync(sql);
             }
 
@@ -262,11 +221,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
-            var item = new Item
-            {
-                Code        = "Test.732",
-                Description = "Testing item with tags"
-            };
+            var item = Item.Create("Test.732", "Testing item with tags");
             repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
@@ -292,11 +247,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
-            var item = new Item
-            {
-                Code        = "Test.733",
-                Description = "Testing item with tags"
-            };
+            var item = Item.Create("Test.733", "Testing item with tags");
             item.AddTag(new Tag("ATag 1"));
             item.AddTag(new Tag("ATag 2"));
             item.AddTag(new Tag("ATag 3"));

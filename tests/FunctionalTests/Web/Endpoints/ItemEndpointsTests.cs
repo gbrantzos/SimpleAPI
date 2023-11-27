@@ -93,7 +93,8 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
         var json = """
                    {
                      "code": "139",
-                     "description": "Testing 139"
+                     "description": "Testing 139",
+                     "price": 4.34
                    }
                    """;
         var newID = await _client.CreateUsingApiAsync(Endpoint, json);
@@ -147,7 +148,8 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
         var existing = """
                        {
                          "code": "321",
-                         "description": "Testing 321"
+                         "description": "Testing 321",
+                         "price": 1.32
                        }
                        """;
         var newID = await _client.CreateUsingApiAsync(Endpoint, existing);
@@ -157,7 +159,8 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
                    {
                      "rowVersion": 1,
                      "code": "412",
-                     "description": "Changing item 412"
+                     "description": "Changing item 412",
+                     "price": 3.32
                    }
                    """;
         var response = await _client.PutStringAsJsonAsync($"{Endpoint}/{newID}", json);
