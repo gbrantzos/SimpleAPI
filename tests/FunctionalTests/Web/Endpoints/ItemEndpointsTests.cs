@@ -270,7 +270,7 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
         var newID = await _client.CreateUsingApiAsync(Endpoint, existing);
 
         // Act
-        var response = await _client.DeleteAsync($"{Endpoint}/{newID}/1");
+        var response = await _client.DeleteAsync($"{Endpoint}/{newID}?version=1");
 
         // Assert
         response.ShouldReturn(HttpStatusCode.NoContent);
@@ -285,7 +285,7 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
     public async Task DELETE_non_existing_item_should_return_Not_Found()
     {
         // Act
-        var response = await _client.DeleteAsync($"{Endpoint}/556/7");
+        var response = await _client.DeleteAsync($"{Endpoint}/556?version=7");
 
         // Assert
         response.ShouldReturn(HttpStatusCode.NotFound, "application/problem+json");
@@ -311,7 +311,7 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
         var newID = await _client.CreateUsingApiAsync(Endpoint, existing);
 
         // Act
-        var response = await _client.DeleteAsync($"{Endpoint}/{newID}/14");
+        var response = await _client.DeleteAsync($"{Endpoint}/{newID}?version=14");
 
         // Assert
         response.ShouldReturn(HttpStatusCode.Conflict, "application/problem+json");

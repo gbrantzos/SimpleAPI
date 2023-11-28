@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -40,10 +41,10 @@ public class ItemEndpoints : IEndpointMapper
             //     op.Responses["200"].Content["application/json"].Examples.Add("base", example);
             //     return op;
             // });
-        group.MapPut("{id:int}", UpdateItem.Handle)
+        group.MapPut("{id}", UpdateItem.Handle)
             .WithName("UpdateItem")
             .WithSummary("Update existing item");
-        group.MapDelete("{id:int}/{rowVersion:int}", DeleteItem.Handle)
+        group.MapDelete("{id}", DeleteItem.Handle)
             .WithName("DeleteItem")
             .WithSummary("Delete item by ID");
 
@@ -104,7 +105,7 @@ public class ItemEndpoints : IEndpointMapper
     private static class DeleteItem
     {
         public static async Task<IResult> Handle(int id,
-            int rowVersion,
+            [FromQuery(Name = "version")] int rowVersion,
             IMediator mediator,
             ErrorMapper errorMapper,
             CancellationToken cancellationToken)

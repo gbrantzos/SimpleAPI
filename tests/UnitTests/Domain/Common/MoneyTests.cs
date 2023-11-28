@@ -22,6 +22,7 @@ public class MoneyTests
 
         Money inEuro = Money.InEuro(3.28M);
         inEuro.Should().NotBeNull();
+        inEuro.ToString().Should().Be("3,28 EUR");
     }
 
     [Fact]
@@ -73,5 +74,12 @@ public class MoneyTests
         
         var action = () => a >= Money.Create(3, Currency.USD);
         action.Should().Throw<ArgumentException>().WithMessage("Cannot compare Money values of different currencies!");
+    }
+
+    [Fact]
+    public void Should_throw_on_invalid_currency()
+    {
+        var action = () => Money.Create(23, Currency.Invalid);
+        action.Should().Throw<ArgumentException>().WithMessage("Invalid currency!");
     }
 }

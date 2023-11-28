@@ -5,9 +5,9 @@ namespace SimpleAPI.Application.Features.Items.ViewModels;
 
 public class ItemViewModel : ViewModel
 {
-    public string Code { get; set; } = String.Empty;
-    public string Description { get; set; } = String.Empty;
-    public decimal Price { get; set; }
+    public string Code { get; init; } = String.Empty;
+    public string Description { get; init; } = String.Empty;
+    public decimal Price { get; init; }
 }
 
 public static class ItemViewModelExtensions
