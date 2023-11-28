@@ -1,7 +1,5 @@
 # SimpleAPI
 
----
-
 [![Build & Test 🧪](https://github.com/gbrantzos/SimpleAPI/actions/workflows/build-test.yml/badge.svg)](https://github.com/gbrantzos/SimpleAPI/actions/workflows/build-test.yml)
 
 Simple REST API sample over a CRUD application to "gather" best practices and techniques. It should be based on

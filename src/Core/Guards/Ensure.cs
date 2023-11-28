@@ -35,19 +35,16 @@ public static class Ensure
     /// </summary>
     /// <param name="obj"></param>
     /// <param name="condition"></param>
-    /// <param name="conditionName"></param>
     /// <param name="message"></param>
     /// <typeparam name="T"></typeparam>
     /// <exception cref="InvalidOperationException"></exception>
     public static void Applies<T>(T obj, 
         Predicate<T> condition,
-        [CallerArgumentExpression("condition")]
-        string? conditionName = null,
-        string? message = null) where T : class
+        string message) where T : class
     {
-        if (condition(obj))
+        if (!condition(obj))
         {
-            throw new InvalidOperationException($"{conditionName} should be true");
+            throw new ArgumentException(message);
         }
     }
 }

@@ -18,7 +18,7 @@ public static class GuardExtensions
     {
         if (parameter == null)
         {
-            throw new ArgumentNullException(parameterName, message ?? $"Parameter '{parameterName}' is null!");
+            throw new ArgumentNullException(parameterName, message ?? $"Input parameter cannot be null");
         }
         return parameter;
     }
@@ -35,7 +35,7 @@ public static class GuardExtensions
     {
         if (string.IsNullOrEmpty(parameter))
         {
-            throw new ArgumentNullException(parameterName, message ?? $"Parameter '{parameterName}' is null or empty!");
+            throw new ArgumentNullException(parameterName, message ??"Input parameter cannot be null or empty!");
         }
         return parameter;
     }

@@ -10,12 +10,12 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable
     private readonly List<Tag> _tags = new List<Tag>();
 
     public int RowVersion { get; set; }
-    public string Code { get; private set; }
+    public ItemCode Code { get; private set; }
     public string Description { get; set; }
     public Money Price { get; private set; } = Money.InEuro(0);
     public IReadOnlyCollection<Tag> Tags => _tags.AsReadOnly();
 
-    private Item(string code, string description)
+    private Item(ItemCode code, string description)
     {
         Code        = code;
         Description = description;
@@ -23,7 +23,7 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable
     
     public static Item Create(string code, string description)
     {
-        var newItem = new Item(code, description);
+        var newItem = new Item((ItemCode)code, description);
         return newItem;
     }
 

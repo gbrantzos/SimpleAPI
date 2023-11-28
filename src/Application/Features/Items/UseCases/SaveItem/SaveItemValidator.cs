@@ -11,5 +11,7 @@ public class SaveItemValidator : AbstractValidator<SaveItemCommand>
 
 public class ItemViewModelValidator : AbstractValidator<ItemViewModel>
 {
-    public ItemViewModelValidator() => RuleFor(m => m.Code).NotEmpty();
+    public ItemViewModelValidator() => RuleFor(m => m.Code)
+        .NotEmpty()
+        .Length(3, 50);
 }
