@@ -1,34 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using SimpleAPI.Core;
 using SimpleAPI.Domain.Features.Items;
+using SimpleAPI.Infrastructure.Persistence.Base;
 
 namespace SimpleAPI.Infrastructure.Persistence.Repositories;
 
-public class ItemRepository : IItemRepository
+public class ItemRepository : BaseRepository<Item, ItemID>, IItemRepository
 {
-    private readonly SimpleAPIContext _context;
+    protected override IReadOnlyCollection<string> DefaultDetails => new[] { "Tags" };
 
-    public ItemRepository(SimpleAPIContext context)
-    {
-        _context = context.ThrowIfNull();
-    }
-
-    public void Add(Item entity)
-    {
-        _context.Items.Add(entity);
-    }
-
-    public async Task<Item?> GetByIDAsync(ItemID id, CancellationToken cancellationToken = default)
-    {
-        var result = await _context
-            .Items
-            .Include(i => i.Tags)
-            .SingleOrDefaultAsync(i => i.ID == id, cancellationToken);
-        return result;
-    }
-
-    public void Delete(Item entity)
-    {
-        _context.Items.Remove(entity);
-    }
+    public ItemRepository(SimpleAPIContext context) : base(context) { }
 }
