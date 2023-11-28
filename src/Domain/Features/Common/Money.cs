@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using SimpleAPI.Core.Base;
 
 namespace SimpleAPI.Domain.Features.Common;
@@ -30,7 +31,7 @@ public class Money : ValueObject, IComparable<Money>
         Currency = currency;
     }
 
-    public override string ToString() => $"{Amount:0.00} {Currency:G}";
+    public override string ToString() => $"{Amount.ToString("0.00", CultureInfo.InvariantCulture)} {Currency:G}";
 
     #region Factory, implicit operators
 

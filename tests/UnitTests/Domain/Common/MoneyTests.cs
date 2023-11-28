@@ -22,7 +22,7 @@ public class MoneyTests
 
         Money inEuro = Money.InEuro(3.28M);
         inEuro.Should().NotBeNull();
-        inEuro.ToString().Should().Be("3,28 EUR");
+        inEuro.ToString().Should().Be("3.28 EUR");
     }
 
     [Fact]
