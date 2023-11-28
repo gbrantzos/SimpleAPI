@@ -50,9 +50,6 @@ public class StronglyTypedIDs : IIncrementalGenerator
             var symbolNamespace = symbol.ContainingNamespace;
             var stronglyTypedID = PrepareStronglyTypedID(symbolName, symbolNamespace.ToString());
             context.AddSource($"SimpleAPI.{symbolName}.TypedID.g.cs", stronglyTypedID);
-
-            var typeIDConversion = PrepareTypeIDConversion(symbolName, symbolNamespace.ToString());
-            context.AddSource($"SimpleAPI.{symbolName}.EntityConversion.g.cs", typeIDConversion);
         }
     }
 
@@ -71,6 +68,7 @@ public class StronglyTypedIDs : IIncrementalGenerator
                  #nullable enable
 
                  using SimpleAPI.Domain.Base;
+                 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
                  namespace {{symbolNamespace}};
 
@@ -99,24 +97,14 @@ public class StronglyTypedIDs : IIncrementalGenerator
                      public static bool operator <=({{symbolName}}ID left, {{symbolName}}ID right) => left.CompareTo(right) <= 0;
                      public static bool operator >({{symbolName}}ID left, {{symbolName}}ID right) => left.CompareTo(right) > 0;
                      public static bool operator >=({{symbolName}}ID left, {{symbolName}}ID right) => left.CompareTo(right) >= 0;
-                 }
-                 """;
-    }
-
-    private static string PrepareTypeIDConversion(string symbolName, string symbolNamespace)
-    {
-        return $$"""
-                 using {{symbolNamespace}};
-                 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
-                 namespace SimpleAPI.Infrastructure.Persistence.Configuration;
-
-                 public class {{symbolName}}IDConverter : ValueConverter<{{symbolName}}ID, int>
-                 {
-                     public {{symbolName}}IDConverter() : base(
-                        v => v.Value,
-                        v => new {{symbolName}}ID(v)
-                    ) { }
+                     
+                     public class EFValueConverter : ValueConverter<{{symbolName}}ID, int>
+                     {
+                         public EFValueConverter() : base(
+                            v => v.Value,
+                            v => new {{symbolName}}ID(v)
+                        ) { }
+                     }
                  }
                  """;
     }

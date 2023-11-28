@@ -6,7 +6,7 @@ namespace SimpleAPI.Infrastructure.Persistence.Configuration;
 
 public class TagEntityConfiguration : EntityTypeConfiguration<Tag, TagID>
 {
-    public TagEntityConfiguration() : base(typeof(TagIDConverter)) { }
+    public TagEntityConfiguration() : base(typeof(TagID.EFValueConverter)) { }
 
     public override void Configure(EntityTypeBuilder<Tag> builder)
     {

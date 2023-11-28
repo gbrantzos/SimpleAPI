@@ -7,7 +7,7 @@ namespace SimpleAPI.Infrastructure.Persistence.Configuration;
 
 public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
 {
-    public ItemEntityConfiguration() : base(typeof(ItemIDConverter)) { }
+    public ItemEntityConfiguration() : base(typeof(ItemID.EFValueConverter)) { }
 
     public override void Configure(EntityTypeBuilder<Item> builder)
     {

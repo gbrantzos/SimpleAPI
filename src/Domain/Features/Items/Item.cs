@@ -4,7 +4,7 @@ using SimpleAPI.Domain.Features.Common;
 
 namespace SimpleAPI.Domain.Features.Items;
 
-[HasStronglyTypedID]
+[StronglyTypedID]
 public class Item : Entity<ItemID>, IVersioned
 {
     private readonly List<Tag> _tags = new List<Tag>();
@@ -50,7 +50,7 @@ public class Item : Entity<ItemID>, IVersioned
     }
 }
 
-[HasStronglyTypedID]
+[StronglyTypedID]
 public class Tag : Entity<TagID>
 {
     public Tag(string name) => Name = name;
