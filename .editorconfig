@@ -161,6 +161,10 @@ dotnet_diagnostic.CA1062.severity = none
 
 # The following is mostly for libraries, we can safely skip
 dotnet_diagnostic.CA1724.severity = none
-
 dotnet_diagnostic.CA1867.severity = none
+
+# We will try to initiate only once!
 dotnet_diagnostic.CA1861.severity = none
+
+# We like marker interfaces! :)
+dotnet_diagnostic.CA1040.severity = none

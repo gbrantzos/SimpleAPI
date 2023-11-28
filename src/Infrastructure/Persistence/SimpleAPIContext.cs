@@ -31,17 +31,22 @@ public class SimpleAPIContext : DbContext
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = new())
     {
-        var newOrModified = ChangeTracker
-            .Entries()
-            .Where(e => e is { Entity: Entity, State: EntityState.Added or EntityState.Modified });
-        foreach (var entry in newOrModified)
-        {
-            // Change created and updated timestamps
-            if (entry.State == EntityState.Added)
-                entry.Property(CreatedAt).CurrentValue = _timeProvider.GetNow();
-            entry.Property(ModifiedAt).CurrentValue = _timeProvider.GetNow();
-        }
+        HandleAuditable();
+        HandleVersioned();
 
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        HandleAuditable();
+        HandleVersioned();
+
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    private void HandleVersioned()
+    {
         // Proper ROW_VERSION number for modified entries
         var allVersionedEntries = ChangeTracker.Entries<IVersioned>();
         foreach (var entry in allVersionedEntries)
@@ -53,7 +58,20 @@ public class SimpleAPIContext : DbContext
             // Proper initial ROW_VERSION value for new entries
             if (entry.Entity.RowVersion == 0) entry.Entity.RowVersion = 1;
         }
-        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    private void HandleAuditable()
+    {
+        var newOrModified = ChangeTracker
+            .Entries<IAuditable>()
+            .Where(e => e is { Entity: Entity, State: EntityState.Added or EntityState.Modified });
+        foreach (var entry in newOrModified)
+        {
+            // Change created and updated timestamps
+            if (entry.State == EntityState.Added)
+                entry.Property(CreatedAt).CurrentValue = _timeProvider.GetNow();
+            entry.Property(ModifiedAt).CurrentValue = _timeProvider.GetNow();
+        }
     }
 
     public string GetDbSchema() => this.Database.GenerateCreateScript();

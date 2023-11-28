@@ -42,9 +42,12 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
                 .HasColumnName(SimpleAPIContext.RowVersion);
         }
 
-        builder.Property<DateTime>(SimpleAPIContext.CreatedAt).HasColumnOrder(-12);
-        builder.Property<DateTime>(SimpleAPIContext.ModifiedAt).HasColumnOrder(-11);
-
+        if (typeof(TEntity).GetInterfaces().Contains(typeof(IAuditable)))
+        {
+            builder.Property<DateTime>(SimpleAPIContext.CreatedAt).HasColumnOrder(-12);
+            builder.Property<DateTime>(SimpleAPIContext.ModifiedAt).HasColumnOrder(-11);
+        }
+        
         builder.Ignore(e => e.IsNew);
 
         var skipProperties = BasicProperties.Concat(_skipProperties);

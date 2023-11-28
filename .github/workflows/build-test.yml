@@ -26,5 +26,7 @@ jobs:
       - name: Build 🧱
         run: dotnet build SimpleAPI.sln --configuration Release --no-restore
 
-#      - name: Test 🧪
-#        run: dotnet test SimpleAPI --configuration Release --no-build
+      - name: Test 🧪
+        run: |
+          dotnet test tests/UnitTests/UnitTests.csproj --configuration Release --no-build
+          dotnet test tests/FunctionalTests/FunctionalTests.csproj --configuration Release --no-build

@@ -12,7 +12,7 @@ public class StronglyTypedIdsTests
 
                     namespace SimpleAPI.Base;
                     {
-                        [HasStronglyTypedID]
+                        [StronglyTypedID]
                         public class Item
                         {
                             public string Name { get; set; }
@@ -24,10 +24,7 @@ public class StronglyTypedIdsTests
                                  namespace SimpleAPI.Core
                                  {
                                      [System.AttributeUsage(System.AttributeTargets.Class)]
-                                     public class HasStronglyTypedID : System.Attribute { }
-                                     
-                                     [System.AttributeUsage(System.AttributeTargets.Class)]
-                                     public class HasEntityIDConversion : System.Attribute { }
+                                     public class StronglyTypedID : System.Attribute { }
                                  }
                                  """;
         
@@ -43,6 +40,7 @@ public class StronglyTypedIdsTests
                               #nullable enable
 
                               using SimpleAPI.Domain.Base;
+                              using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
                               namespace SimpleAPI.Base;
 
@@ -71,29 +69,22 @@ public class StronglyTypedIdsTests
                                   public static bool operator <=(ItemID left, ItemID right) => left.CompareTo(right) <= 0;
                                   public static bool operator >(ItemID left, ItemID right) => left.CompareTo(right) > 0;
                                   public static bool operator >=(ItemID left, ItemID right) => left.CompareTo(right) >= 0;
+                                  
+                                  public class EFValueConverter : ValueConverter<ItemID, int>
+                                  {
+                                      public EFValueConverter() : base(
+                                         v => v.Value,
+                                         v => new ItemID(v)
+                                     ) { }
+                                  }
                               }
                               """;
         
-        var expectedConversion = """
-                                 using SimpleAPI.Base;
-                                 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-                                 namespace SimpleAPI.Infrastructure.Persistence.Configuration;
-                                 
-                                 public class ItemIDConverter : ValueConverter<ItemID, int>
-                                 {
-                                     public ItemIDConverter() : base(
-                                        v => v.Value,
-                                        v => new ItemID(v)
-                                    ) { }
-                                 }
-                                 """;
         var actual = GeneratorTestsHelper.GetGeneratedOutput(input);
-
         actual.Should().NotBeNull();
-        actual.Count.Should().Be(3);
+        actual.Count.Should().Be(2);
         actual[0].Should().Be(expectedAttributes);
         actual[1].Should().Be(expectedTypeIDs);
-        actual[2].Should().Be(expectedConversion);
     }
 }

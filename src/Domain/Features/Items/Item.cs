@@ -5,7 +5,7 @@ using SimpleAPI.Domain.Features.Common;
 namespace SimpleAPI.Domain.Features.Items;
 
 [StronglyTypedID]
-public class Item : Entity<ItemID>, IVersioned
+public class Item : Entity<ItemID>, IVersioned, IAuditable
 {
     private readonly List<Tag> _tags = new List<Tag>();
 
