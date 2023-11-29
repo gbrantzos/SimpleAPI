@@ -16,7 +16,8 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
         builder.Property(p => p.Code)
             .HasColumnName("code")
             .HasConversion(v => (string)v, v => ItemCode.FromString(v))
-            .HasMaxLength(50).IsRequired();
+            .HasMaxLength(50)
+            .IsRequired();
         
         builder.Property(p => p.Description)
             .HasMaxLength(500)
@@ -37,6 +38,14 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
             .HasForeignKey("item_id")
             .HasConstraintName("fk_tag__item_id")
             .HasRelatedTableIndexName("idx_tag__item_id");
+
+        builder.HasMany(p => p.AlternativeCodes)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasForeignKey("item_id")
+            .HasConstraintName("fk_item_alternative_code__item_id")
+            .HasRelatedTableIndexName("idx_item_alternative_code__item_id");
+        
 
         builder.Navigation(p => p.Tags).UsePropertyAccessMode(PropertyAccessMode.Field);
     }

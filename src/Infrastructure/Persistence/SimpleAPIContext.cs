@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleAPI.Application.Common;
 using SimpleAPI.Domain.Base;
 using SimpleAPI.Domain.Features.Items;
+using SimpleAPI.Infrastructure.Persistence.Configuration;
 
 namespace SimpleAPI.Infrastructure.Persistence;
 
@@ -25,7 +26,15 @@ public class SimpleAPIContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(SimpleAPIContext).Assembly);
+
+        // Since we use shadow FKs we need to configure Item first
+        // Probably we need to somehow define this somewhere :(
+        modelBuilder.ApplyConfiguration(new ItemEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ItemAlternativeCodesConfiguration());
+        modelBuilder.ApplyConfiguration(new TagEntityConfiguration());
+        
+        // If we cannot solve the previous problem we cannot use the following
+        // modelBuilder.ApplyConfigurationsFromAssembly(typeof(SimpleAPIContext).Assembly);
     }
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,

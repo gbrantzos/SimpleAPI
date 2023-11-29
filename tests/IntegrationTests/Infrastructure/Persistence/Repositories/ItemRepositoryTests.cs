@@ -29,6 +29,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         item.AddTag(new Tag("Testing 2"));
         item.AddTag(new Tag("Testing 3"));
 
+        item.AddCode((ItemCode)"ALTER.0098");
+
         await _database.Context.ExecuteAndRollbackAsync(async () =>
             {
                 // Act
@@ -37,8 +39,13 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
                 // Assert
                 _database.Context.ChangeTracker.Clear();
-                var actual = _database.Context.Items.Include(i => i.Tags).Single(i => i.Code == item.Code);
-                actual.Should().BeEquivalentTo(item);
+                // var actual = _database.Context.Items
+                //     .Include(i => i.Tags)
+                //     .Include(i => i.AlternativeCodes)
+                //     .Single(i => i.Code == item.Code);
+                var actual = await repository.GetByIDAsync(item.ID);
+                actual.Should().BeEquivalentTo(item, options => options
+                    .For(i => i.AlternativeCodes).Exclude(c => c.ID));
             }
         );
     }
@@ -122,7 +129,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
             // Assert
             actual.Should().NotBeNull();
-            actual.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected, options => options
+                .For(i => i.AlternativeCodes).Exclude(c => c.ID));
         });
     }
 
@@ -230,12 +238,19 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             existingItem.AddTag(new Tag("Tag 1"));
             existingItem.AddTag(new Tag("Tag 2"));
+            
+            existingItem.AddCode((ItemCode)"ALT.0098");
+            existingItem.AddCode((ItemCode)"ALT.2098");
+            existingItem.AddCode((ItemCode)"ALT.2098");
+            existingItem.AddCode((ItemCode)"MAK.7098");
+            
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
             var actual = await repository.GetByIDAsync(item.ID);
             actual.Should().NotBeNull();
-            actual.Should().BeEquivalentTo(existingItem);
+            actual.Should().BeEquivalentTo(existingItem, options => options
+                .For(i => i.AlternativeCodes).Exclude(c => c.ID));
         });
     }
 
@@ -253,6 +268,11 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             item.AddTag(new Tag("ATag 3"));
             item.AddTag(new Tag("ATag 4"));
 
+            item.AddCode((ItemCode)"ALT.0098");
+            item.AddCode((ItemCode)"ALT.2098");
+            item.AddCode((ItemCode)"ALT.2098");
+            item.AddCode((ItemCode)"MAK.7098");
+            
             repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
@@ -263,12 +283,17 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             existingItem.RemoveTag(new Tag("ATag 4"));
             existingItem.RemoveTag(new Tag("ATag 6")); // This one should not be found, but causes no issues!
 
+            
+            existingItem.RemoveCode((ItemCode)"ALT.0098");
+            existingItem.RemoveCode((ItemCode)"ALT.2098");
+            
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
             var actual = await repository.GetByIDAsync(item.ID);
             actual.Should().NotBeNull();
-            actual.Should().BeEquivalentTo(existingItem);
+            actual.Should().BeEquivalentTo(existingItem, options => options
+                .For(i => i.AlternativeCodes).Exclude(c => c.ID));
         });
     }
 }

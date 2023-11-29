@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleAPI.Core;
@@ -53,7 +54,7 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
         var skipProperties = BasicProperties.Concat(_skipProperties);
         var properties = entityType
             .GetProperties()
-            .Where(p => p.PropertyType.IsPrimitive || p.PropertyType == typeof(string))
+            .Where(IsSimpleProperty)
             .Select(p => p.Name)
             .Except(skipProperties);
         foreach (var property in properties)
@@ -61,4 +62,7 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
             builder.Property(property).HasColumnName(property.ToSnakeCase());
         }
     }
+
+    private static bool IsSimpleProperty(PropertyInfo p)
+        => p.PropertyType.IsPrimitive || p.PropertyType.IsEnum || p.PropertyType == typeof(string);
 }
