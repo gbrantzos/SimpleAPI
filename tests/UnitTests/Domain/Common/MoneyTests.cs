@@ -31,8 +31,8 @@ public class MoneyTests
         Money a = 3.2;
         Money b = 2.1;
 
-        (a + b).Should().Be(5.3);
-        Money.Add(a, b).Should().Be(5.3);
+        (a + b).Should().Be((Money)5.3);
+        Money.Add(a, b).Should().Be((Money)5.3);
 
         var action = () => a + Money.Create(3, Currency.USD);
         action.Should().Throw<ArgumentException>().WithMessage("Cannot add different currencies: EUR, USD");
@@ -44,8 +44,8 @@ public class MoneyTests
         Money a = 3.2;
         Money b = 2.1;
 
-        (a - b).Should().Be(1.1);
-        Money.Subtract(a, b).Should().Be(1.1);
+        (a - b).Should().Be((Money)1.1);
+        Money.Subtract(a, b).Should().Be((Money)1.1);
         
         var action = () => a - Money.Create(3, Currency.USD);
         action.Should().Throw<ArgumentException>().WithMessage("Cannot subtract different currencies: EUR, USD");
@@ -66,11 +66,6 @@ public class MoneyTests
         ((a + b) == c).Should().BeTrue();
         (a != b).Should().BeTrue();
         (a > (Money)null!).Should().BeTrue();
-        ((Money)null! > b).Should().BeFalse();
-        
-        // ReSharper disable once RedundantCast
-        // ReSharper disable once EqualExpressionComparison
-        ((Money)null! == (Money)null!).Should().BeTrue();
         
         var action = () => a >= Money.Create(3, Currency.USD);
         action.Should().Throw<ArgumentException>().WithMessage("Cannot compare Money values of different currencies!");

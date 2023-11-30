@@ -36,8 +36,7 @@ public class ItemCodeTests
         (a != c).Should().BeTrue();
 
     }
-
-
+    
     [Fact]
     public void Should_throw_on_invalid_currency()
     {
@@ -49,7 +48,7 @@ public class ItemCodeTests
         lessThanThree.Should().Throw<ArgumentException>()
             .WithMessage("Code length must be between 3 and 50 characters");
 
-        var nullInput = () => (ItemCode)null!;
+        var nullInput = () => ItemCode.FromString(null!);
         nullInput.Should().Throw<ArgumentException>()
             .WithMessage("Input parameter cannot be null (Parameter 'code')");
 

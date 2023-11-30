@@ -10,7 +10,7 @@ public class ValueObjectTests
         public long ID { get; set; }
         public long Sequence { get; set; }
         
-        protected override IEnumerable<object> GetEqualityComponents()
+        protected override IEnumerable<IComparable> GetEqualityComponents()
         {
             yield return ID;
             yield return Sequence;

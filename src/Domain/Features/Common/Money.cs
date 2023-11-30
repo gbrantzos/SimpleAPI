@@ -17,7 +17,7 @@ public enum Currency
 }
 
 [SuppressMessage("Design", "CA1036:Override methods on comparable types")]
-public class Money : ValueObject, IComparable<Money>
+public class Money : ValueObject
 {
     public decimal Amount { get; }
     public Currency Currency { get; }
@@ -47,48 +47,22 @@ public class Money : ValueObject, IComparable<Money>
     #endregion
 
     #region Compare
-
-    public int CompareTo(Money? other)
+    public override int CompareTo(ValueObject? other)
     {
         if (other == null) return 1;
-        if (other.Currency != Currency)
+        if (other is Money money && money.Currency != Currency)
             throw new ArgumentException("Cannot compare Money values of different currencies!");
 
-        return Amount.CompareTo(other.Amount);
+        return base.CompareTo(other);
     }
-
-    private static int Compare(Money left, Money right)
-    {
-        if (ReferenceEquals(left, null) & !ReferenceEquals(right, null)) return -1;
-        if (!ReferenceEquals(left, null) & ReferenceEquals(right, null)) return 1;
-        if (ReferenceEquals(left, null) & ReferenceEquals(right, null)) return 0;
-
-        return left!.CompareTo(right);
-    }
-
-    public static bool operator >(Money left, Money right) => Compare(left, right) == 1;
-    public static bool operator <(Money left, Money right) => Compare(left, right) == -1;
-    public static bool operator >=(Money left, Money right) => Compare(left, right) >= 0;
-    public static bool operator <=(Money left, Money right) => Compare(left, right) <= 0;
-
     #endregion
 
     #region Equality
-
-    protected override IEnumerable<object> GetEqualityComponents()
+    protected override IEnumerable<IComparable> GetEqualityComponents()
     {
         yield return Amount;
         yield return Currency;
     }
-
-    public override bool Equals(ValueObject? other)
-    {
-        if (other is Money money && money.Currency != Currency)
-            throw new ArgumentException("Cannot compare Money values of different currencies!");
-
-        return base.Equals(other);
-    }
-
     #endregion
 
     #region Add/Subtract
