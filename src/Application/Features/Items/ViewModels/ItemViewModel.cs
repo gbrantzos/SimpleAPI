@@ -24,6 +24,7 @@ public static class ItemViewModelExtensions
             Price       = item.Price.Amount,
             AlternativeCodes = item
                 .AlternativeCodes
+                .Where(c => c.Kind != ItemAlternativeCode.CodeKind.Base)
                 .Select(c => c.ToViewModel())
                 .ToList()
         };
