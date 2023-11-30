@@ -8,6 +8,8 @@ public class ItemViewModel : ViewModel
     public string Code { get; init; } = String.Empty;
     public string Description { get; init; } = String.Empty;
     public decimal Price { get; init; }
+
+    public IEnumerable<ItemAlternativeCodeViewModel> AlternativeCodes { get; init; } = new List<ItemAlternativeCodeViewModel>();
 }
 
 public static class ItemViewModelExtensions
@@ -19,6 +21,10 @@ public static class ItemViewModelExtensions
             RowVersion  = item.RowVersion,
             Code        = item.Code,
             Description = item.Description,
-            Price       = item.Price.Amount
+            Price       = item.Price.Amount,
+            AlternativeCodes = item
+                .AlternativeCodes
+                .Select(c => c.ToViewModel())
+                .ToList()
         };
 }
