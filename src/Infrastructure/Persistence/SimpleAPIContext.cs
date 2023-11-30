@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using SimpleAPI.Application.Common;
 using SimpleAPI.Domain.Base;
 using SimpleAPI.Domain.Features.Items;
@@ -35,6 +36,19 @@ public class SimpleAPIContext : DbContext
         
         // If we cannot solve the previous problem we cannot use the following
         // modelBuilder.ApplyConfigurationsFromAssembly(typeof(SimpleAPIContext).Assembly);
+        
+        // Normalize column ordering
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var propertyInfo in entityType.GetProperties())
+            {
+                if (propertyInfo.IsShadowProperty()) continue;
+                var annotation = propertyInfo.GetAnnotations();
+                var columnOrder = annotation.FirstOrDefault(a => a.Name == RelationalAnnotationNames.ColumnOrder);
+                if (columnOrder is null)
+                    propertyInfo.SetAnnotation(RelationalAnnotationNames.ColumnOrder, 30);
+            }
+        }
     }
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,

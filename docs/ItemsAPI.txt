@@ -14,12 +14,12 @@ POST	/items			+ Body
     -> returns 201, newly created item (as GetByID)
        returns 400, bad request (validation failed)
        
-PUT		/items/{id}		+ Body + ETag header (row version)					
+PUT		/items/{id}		+ Body (row version in body - VM)					
     -> returns 200, modified item (as GetByID)
        returns 400, bad request (validation failed)
        returns 409, conflict (row version mismatch)
        
-DELETE	/items/{id}		+ ETag header (row version)							
+DELETE	/items/{id}		+ version query parameter (row version)							
     -> returns 204, no-content
        returns 404, item not found
        returns 409, conflict (row version mismatch)

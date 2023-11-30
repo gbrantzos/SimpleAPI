@@ -12,8 +12,9 @@ public class ItemAlternativeCode : Entity<ItemAlternativeCodeID>, IAuditable
         Alternative = 1
     }
     
-    public ItemCode Code { get; set; }
-    public CodeKind Kind { get; set; }
+    public ItemCode Code { get; }
+    public CodeKind Kind { get; }
+    public string? Description { get; set; }
 
     public ItemAlternativeCode(ItemCode code, CodeKind kind)
     {

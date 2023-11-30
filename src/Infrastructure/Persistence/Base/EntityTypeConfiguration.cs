@@ -33,22 +33,22 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
             .HasColumnName(SimpleAPIContext.ID)
             .HasConversion(_idConversion)
             .ValueGeneratedOnAdd()
-            .HasColumnOrder(-20);
+            .HasColumnOrder(-22);
 
         if (typeof(TEntity).GetInterfaces().Contains(typeof(IVersioned)))
         {
             builder.Property(e => ((IVersioned)e).RowVersion)
                 .IsConcurrencyToken()
-                .HasColumnOrder(-19)
+                .HasColumnOrder(-21)
                 .HasColumnName(SimpleAPIContext.RowVersion);
         }
 
         if (typeof(TEntity).GetInterfaces().Contains(typeof(IAuditable)))
         {
-            builder.Property<DateTime>(SimpleAPIContext.CreatedAt).HasColumnOrder(-12);
-            builder.Property<DateTime>(SimpleAPIContext.ModifiedAt).HasColumnOrder(-11);
+            builder.Property<DateTime>(SimpleAPIContext.CreatedAt).HasColumnOrder(101);
+            builder.Property<DateTime>(SimpleAPIContext.ModifiedAt).HasColumnOrder(103);
         }
-        
+
         builder.Ignore(e => e.IsNew);
 
         var skipProperties = BasicProperties.Concat(_skipProperties);
@@ -59,7 +59,8 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
             .Except(skipProperties);
         foreach (var property in properties)
         {
-            builder.Property(property).HasColumnName(property.ToSnakeCase());
+            builder.Property(property)
+                .HasColumnName(property.ToSnakeCase());
         }
     }
 

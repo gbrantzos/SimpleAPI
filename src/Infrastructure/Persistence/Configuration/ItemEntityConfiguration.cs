@@ -18,7 +18,7 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
             .HasConversion(v => (string)v, v => ItemCode.FromString(v))
             .HasMaxLength(50)
             .IsRequired();
-        
+
         builder.Property(p => p.Description)
             .HasMaxLength(500)
             .IsRequired();
@@ -45,9 +45,8 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
             .HasForeignKey("item_id")
             .HasConstraintName("fk_item_alternative_code__item_id")
             .HasRelatedTableIndexName("idx_item_alternative_code__item_id");
-        
 
         builder.Navigation(p => p.Tags).UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(p => p.AlternativeCodes).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
-

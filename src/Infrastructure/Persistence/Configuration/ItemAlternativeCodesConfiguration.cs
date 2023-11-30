@@ -19,6 +19,8 @@ public class ItemAlternativeCodesConfiguration : EntityTypeConfiguration<ItemAlt
         
         // More details https://stackoverflow.com/a/24645345/3410871
         builder.HasKey(new[] { "ID", "item_id" });
+        builder.Property("item_id").HasColumnOrder(1);
+        
         base.Configure(builder);
         
         builder.Property(p => p.Code)
@@ -26,6 +28,7 @@ public class ItemAlternativeCodesConfiguration : EntityTypeConfiguration<ItemAlt
             .HasConversion(v => (string)v, v => ItemCode.FromString(v))
             .HasMaxLength(50)
             .IsRequired();
+
 
         builder.HasIndex(p => p.Code).HasDatabaseName("idx_item_alternative_code__code");
     }
