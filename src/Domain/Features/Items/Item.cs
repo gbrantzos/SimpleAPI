@@ -16,27 +16,27 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable
     public Money Price { get; private set; } = Money.InEuro(0);
     public IReadOnlyCollection<Tag> Tags => _tags.AsReadOnly();
     public IReadOnlyCollection<ItemAlternativeCode> AlternativeCodes => _alternativeCodes.AsReadOnly();
-    
+
     private Item(ItemCode code, string description)
     {
         Code        = code;
         Description = description;
     }
-    
+
     public static Item Create(string code, string description)
     {
         var newItem = new Item((ItemCode)code, description);
-        
+
         var alternativeCode = new ItemAlternativeCode((ItemCode)code, ItemAlternativeCode.CodeKind.Base);
         newItem._alternativeCodes.Add(alternativeCode);
-        
+
         return newItem;
     }
 
     public override string ToString() => $"Item with ID {ID}";
 
     public void SetPrice(Money price) => Price = price;
-    
+
     public void AddTag(Tag tag)
     {
         var existing = _tags.FirstOrDefault(t => t.Name == tag.Name);
@@ -55,18 +55,21 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable
         }
     }
 
-    public void AddCode(ItemCode code)
+    public void AddCode(ItemCode code, string? description = null)
     {
         var existing = _alternativeCodes
             .FirstOrDefault(c => c.Code == code && c.Kind == ItemAlternativeCode.CodeKind.Alternative);
         if (existing is not null)
             return;
-        
-        var alternativeCode = new ItemAlternativeCode(code, ItemAlternativeCode.CodeKind.Alternative);
+
+        var alternativeCode = new ItemAlternativeCode(code, ItemAlternativeCode.CodeKind.Alternative)
+        {
+            Description = description
+        };
         _alternativeCodes.Add(alternativeCode);
     }
 
-    public void RemoveCode(ItemCode code)
+    public void RemoveCode(string code)
     {
         var existing = _alternativeCodes
             .FirstOrDefault(c => c.Code == code && c.Kind == ItemAlternativeCode.CodeKind.Alternative);
@@ -75,13 +78,16 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable
             _alternativeCodes.Remove(existing);
         }
     }
+
+    public ItemAlternativeCode? GetCode(string code)
+        => _alternativeCodes.FirstOrDefault(c => c.Code == code && c.Kind == ItemAlternativeCode.CodeKind.Alternative);
 }
 
 [StronglyTypedID]
 public class Tag : Entity<TagID>
 {
     public Tag(string name) => Name = name;
-    
+
     public string Name { get; init; }
 
     public override string ToString() => $"{Name} [ID {ID}]";

@@ -284,8 +284,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             existingItem.RemoveTag(new Tag("ATag 6")); // This one should not be found, but causes no issues!
 
             
-            existingItem.RemoveCode((ItemCode)"ALT.0098");
-            existingItem.RemoveCode((ItemCode)"ALT.2098");
+            existingItem.RemoveCode("ALT.0098");
+            existingItem.RemoveCode("ALT.2098");
             
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();

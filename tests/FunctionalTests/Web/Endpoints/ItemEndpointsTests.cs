@@ -34,13 +34,21 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
     private async Task POST_item_should_return_OK()
     {
         // Arrange
-        var json = """
-                   {
-                     "code": "287",
-                     "description": "Testing 287",
-                     "price": 3.15
-                   }
-                   """;
+        var json =
+            """
+            {
+              "code": "287",
+              "description": "Testing 287",
+              "price": 3.15,
+              "alternativeCodes": [
+                {
+                    "code": "ALTER.001",
+                    "kind": 1,
+                    "description": "Δοκιμαστικός κωδικός"
+                }
+              ]
+            }
+            """;
 
         // Act
         var response = await _client.PostStringAsJsonAsync(Endpoint, json);
@@ -90,13 +98,21 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
     public async Task GET_existing_item_should_return_OK()
     {
         // Arrange
-        var json = """
-                   {
-                     "code": "139",
-                     "description": "Testing 139",
-                     "price": 4.34
-                   }
-                   """;
+        var json =
+            """
+            {
+              "code": "139",
+              "description": "Testing 139",
+              "price": 4.34,
+              "alternativeCodes": [
+                {
+                  "code": "ALTER.001",
+                  "kind": 1,
+                  "description": "Δοκιμαστικός κωδικός"
+                }
+              ]
+            }
+            """;
         var newID = await _client.CreateUsingApiAsync(Endpoint, json);
 
         // Act
@@ -140,34 +156,67 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
         // Assert
         response.ShouldReturn(HttpStatusCode.BadRequest, "application/problem+json");
     }
-    
+
     [Fact]
     public async Task PUT_existing_item_should_return_OK()
     {
         // Arrange
-        var existing = """
-                       {
-                         "code": "321",
-                         "description": "Testing 321",
-                         "price": 1.32
-                       }
-                       """;
+        var existing =
+            """
+            {
+              "code": "321",
+              "description": "Testing 321",
+              "price": 1.32,
+              "alternativeCodes": [
+                {
+                  "code": "ALTER.001",
+                  "kind": 1,
+                  "description": "Δοκιμαστικός κωδικός"
+                }, {
+                  "code": "ALTER.002",
+                  "kind": 1,
+                  "description": "Δοκιμαστικός κωδικός - 002"
+                }
+              ]
+            }
+            """;
         var newID = await _client.CreateUsingApiAsync(Endpoint, existing);
 
         // Act
-        var json = """
-                   {
-                     "rowVersion": 1,
-                     "code": "412",
-                     "description": "Changing item 412",
-                     "price": 3.32
-                   }
-                   """;
+        var json =
+            """
+            {
+              "rowVersion": 1,
+              "code": "321",
+              "description": "Changing item 412",
+              "price": 3.32,
+              "alternativeCodes": [
+                {
+                  "code": "ALTER.941",
+                  "kind": 1,
+                  "description": "New alternative code"
+               }, {
+                  "code": "ALTER.002",
+                  "kind": 1,
+                  "description": "Modified Code"
+               }
+              ]
+            }
+            """;
         var response = await _client.PutStringAsJsonAsync($"{Endpoint}/{newID}", json);
 
         // Assert
         response.ShouldReturn(HttpStatusCode.OK);
         response.Content.Should().NotBeNull();
+        
+        // Get again to make sure changes are applied
+        var url = $"{Endpoint}/{newID}";
+        var assertResponse = await _client.GetAsync(url);
+        var content = await assertResponse.Content.ReadAsStringAsync();
+        var actual = content.FromJson<ItemViewModel>();
+        var expected = json.FromJson<ItemViewModel>();
+        expected.ID = newID;
+        actual.Should().BeEquivalentTo(expected, options => options.Excluding(p => p.RowVersion));
     }
 
     [Fact]
