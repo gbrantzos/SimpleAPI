@@ -5,7 +5,7 @@ using SimpleAPI.Domain.Features.Common;
 namespace SimpleAPI.Domain.Features.Items;
 
 [StronglyTypedID]
-public class Item : Entity<ItemID>, IVersioned, IAuditable
+public class Item : Entity<ItemID>, IVersioned, IAuditable, ISoftDelete
 {
     private readonly List<Tag> _tags = new List<Tag>();
     private readonly List<ItemAlternativeCode> _alternativeCodes = new();
@@ -55,21 +55,20 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable
         }
     }
 
-    public void AddCode(ItemCode code, string? description = null)
+    public void AddAlternativeCode(string code, string? description = null)
     {
-        var existing = _alternativeCodes
-            .FirstOrDefault(c => c.Code == code && c.Kind == ItemAlternativeCode.CodeKind.Alternative);
+        var existing = GetAlternativeCode(code);
         if (existing is not null)
             return;
 
-        var alternativeCode = new ItemAlternativeCode(code, ItemAlternativeCode.CodeKind.Alternative)
+        var alternativeCode = new ItemAlternativeCode((ItemCode)code, ItemAlternativeCode.CodeKind.Alternative)
         {
             Description = description
         };
         _alternativeCodes.Add(alternativeCode);
     }
 
-    public void RemoveCode(string code)
+    public void RemoveAlternativeCode(string code)
     {
         var existing = _alternativeCodes
             .FirstOrDefault(c => c.Code == code && c.Kind == ItemAlternativeCode.CodeKind.Alternative);
@@ -79,7 +78,7 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable
         }
     }
 
-    public ItemAlternativeCode? GetCode(string code)
+    public ItemAlternativeCode? GetAlternativeCode(string code)
         => _alternativeCodes.FirstOrDefault(c => c.Code == code && c.Kind == ItemAlternativeCode.CodeKind.Alternative);
 }
 

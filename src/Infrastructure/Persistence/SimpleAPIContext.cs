@@ -16,6 +16,8 @@ public class SimpleAPIContext : DbContext
     public const string CreatedAt = "created_at";
     public const string ModifiedAt = "modified_at";
     public const string RowVersion = "row_version";
+    public const string IsDeleted = "is_deleted";
+    public const string DeletedAt = "deleted_at";
 
     public DbSet<Item> Items => Set<Item>();
 
@@ -33,35 +35,24 @@ public class SimpleAPIContext : DbContext
         modelBuilder.ApplyConfiguration(new ItemEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ItemAlternativeCodesConfiguration());
         modelBuilder.ApplyConfiguration(new TagEntityConfiguration());
-        
+
         // If we cannot solve the previous problem we cannot use the following
         // modelBuilder.ApplyConfigurationsFromAssembly(typeof(SimpleAPIContext).Assembly);
-        
-        // Normalize column ordering
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            foreach (var propertyInfo in entityType.GetProperties())
-            {
-                if (propertyInfo.IsShadowProperty()) continue;
-                var annotation = propertyInfo.GetAnnotations();
-                var columnOrder = annotation.FirstOrDefault(a => a.Name == RelationalAnnotationNames.ColumnOrder);
-                if (columnOrder is null)
-                    propertyInfo.SetAnnotation(RelationalAnnotationNames.ColumnOrder, 30);
-            }
-        }
     }
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = new())
     {
+        HandleSoftDeleted();
         HandleAuditable();
         HandleVersioned();
 
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
-
+    
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
+        HandleSoftDeleted();
         HandleAuditable();
         HandleVersioned();
 
@@ -94,6 +85,17 @@ public class SimpleAPIContext : DbContext
             if (entry.State == EntityState.Added)
                 entry.Property(CreatedAt).CurrentValue = _timeProvider.GetNow();
             entry.Property(ModifiedAt).CurrentValue = _timeProvider.GetNow();
+        }
+    }
+
+    private void HandleSoftDeleted()
+    {
+        var softDeleted = ChangeTracker
+            .Entries<ISoftDelete>()
+            .Where(e => e.Property<bool>(SimpleAPIContext.IsDeleted).CurrentValue);
+        foreach (var entry in softDeleted)
+        {
+            entry.Property(DeletedAt).CurrentValue = _timeProvider.GetNow();
         }
     }
 

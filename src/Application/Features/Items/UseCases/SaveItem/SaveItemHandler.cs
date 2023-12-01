@@ -66,14 +66,14 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
             .ToList();
         
         foreach (var code in missing)
-            item.RemoveCode(code.Code);
+            item.RemoveAlternativeCode(code.Code);
 
         foreach (var code in alternatives)
         {
-            var existing = item.GetCode(code.Code);
+            var existing = item.GetAlternativeCode(code.Code);
             if (existing is null)
             {
-                item.AddCode((ItemCode)code.Code, code.Description);
+                item.AddAlternativeCode((ItemCode)code.Code, code.Description);
                 continue;
             }
         

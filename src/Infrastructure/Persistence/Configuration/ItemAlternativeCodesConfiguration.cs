@@ -25,10 +25,18 @@ public class ItemAlternativeCodesConfiguration : EntityTypeConfiguration<ItemAlt
         
         builder.Property(p => p.Code)
             .HasColumnName("code")
+            .HasColumnOrder(2)
             .HasConversion(v => (string)v, v => ItemCode.FromString(v))
             .HasMaxLength(50)
             .IsRequired();
 
+        builder.Property(p => p.Kind)
+            .HasColumnName("kind")
+            .HasColumnOrder(3);
+        
+        builder.Property(p => p.Description)
+            .HasColumnName("description")
+            .HasColumnOrder(4);
 
         builder.HasIndex(p => p.Code).HasDatabaseName("idx_item_alternative_code__code");
     }

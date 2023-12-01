@@ -12,8 +12,12 @@ public class TagEntityConfiguration : EntityTypeConfiguration<Tag, TagID>
     public override void Configure(EntityTypeBuilder<Tag> builder)
     {
         builder.HasKey(new[] { "ID", "item_id" });
-        builder.Property("item_id").HasColumnOrder(1);
-        
         base.Configure(builder);
+        
+        builder.Property("item_id").HasColumnOrder(1);
+
+        builder.Property(p => p.Name)
+            .HasColumnOrder(2)
+            .HasColumnName("name");
     }
 }

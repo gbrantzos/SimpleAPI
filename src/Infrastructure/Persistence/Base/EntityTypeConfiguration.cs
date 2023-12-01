@@ -49,21 +49,13 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
             builder.Property<DateTime>(SimpleAPIContext.ModifiedAt).HasColumnOrder(103);
         }
 
-        builder.Ignore(e => e.IsNew);
-
-        var skipProperties = BasicProperties.Concat(_skipProperties);
-        var properties = entityType
-            .GetProperties()
-            .Where(IsSimpleProperty)
-            .Select(p => p.Name)
-            .Except(skipProperties);
-        foreach (var property in properties)
+        if (typeof(TEntity).GetInterfaces().Contains(typeof(ISoftDelete)))
         {
-            builder.Property(property)
-                .HasColumnName(property.ToSnakeCase());
+            builder.Property<bool>(SimpleAPIContext.IsDeleted).HasColumnOrder(105);
+            builder.Property<DateTime?>(SimpleAPIContext.DeletedAt).HasColumnOrder(106);
+            builder.HasQueryFilter(e => EF.Property<bool>(e, SimpleAPIContext.IsDeleted) == false);
         }
-    }
 
-    private static bool IsSimpleProperty(PropertyInfo p)
-        => p.PropertyType.IsPrimitive || p.PropertyType.IsEnum || p.PropertyType == typeof(string);
+        builder.Ignore(e => e.IsNew);
+    }
 }

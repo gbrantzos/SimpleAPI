@@ -29,7 +29,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         item.AddTag(new Tag("Testing 2"));
         item.AddTag(new Tag("Testing 3"));
 
-        item.AddCode((ItemCode)"ALTER.0098");
+        item.AddAlternativeCode("ALTER.0098");
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
             {
@@ -239,10 +239,10 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             existingItem.AddTag(new Tag("Tag 1"));
             existingItem.AddTag(new Tag("Tag 2"));
             
-            existingItem.AddCode((ItemCode)"ALT.0098");
-            existingItem.AddCode((ItemCode)"ALT.2098");
-            existingItem.AddCode((ItemCode)"ALT.2098");
-            existingItem.AddCode((ItemCode)"MAK.7098");
+            existingItem.AddAlternativeCode("ALT.0098");
+            existingItem.AddAlternativeCode("ALT.2098");
+            existingItem.AddAlternativeCode("ALT.2098");
+            existingItem.AddAlternativeCode("MAK.7098");
             
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
@@ -268,10 +268,10 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             item.AddTag(new Tag("ATag 3"));
             item.AddTag(new Tag("ATag 4"));
 
-            item.AddCode((ItemCode)"ALT.0098");
-            item.AddCode((ItemCode)"ALT.2098");
-            item.AddCode((ItemCode)"ALT.2098");
-            item.AddCode((ItemCode)"MAK.7098");
+            item.AddAlternativeCode("ALT.0098");
+            item.AddAlternativeCode("ALT.2098");
+            item.AddAlternativeCode("ALT.2098");
+            item.AddAlternativeCode("MAK.7098");
             
             repository.Add(item);
             await uow.SaveChangesAsync();
@@ -284,8 +284,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             existingItem.RemoveTag(new Tag("ATag 6")); // This one should not be found, but causes no issues!
 
             
-            existingItem.RemoveCode("ALT.0098");
-            existingItem.RemoveCode("ALT.2098");
+            existingItem.RemoveAlternativeCode("ALT.0098");
+            existingItem.RemoveAlternativeCode("ALT.2098");
             
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
@@ -295,5 +295,39 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             actual.Should().BeEquivalentTo(existingItem, options => options
                 .For(i => i.AlternativeCodes).Exclude(c => c.ID));
         });
+    }
+
+    [Fact]
+    public async Task Should_soft_delete_item()
+    {
+        // Arrange
+        var repository = new ItemRepository(_database.Context);
+        var uow = new UnitOfWork(_database.Context);
+
+        await _database.Context.ExecuteAndRollbackAsync(async () =>
+        {
+            var item = Item.Create("Test.003", "Testing item persistence");
+            repository.Add(item);
+            await uow.SaveChangesAsync();
+            _database.Context.ChangeTracker.Clear();
+
+            var dt1 = DateTime.Now;
+            _database.TimeProviderMock.Setup(m => m.GetNow()).Returns(dt1);
+
+            // Act
+            repository.Delete(item);
+            await uow.SaveChangesAsync();
+            _database.Context.ChangeTracker.Clear();
+
+            // Assert
+            var actual = _database
+                .Context
+                .Items
+                .IgnoreQueryFilters()
+                .SingleOrDefault(i => i.Code == item.Code);
+            actual.Should().NotBeNull();
+            _database.Context.Entry(actual!).Property(SimpleAPIContext.DeletedAt).CurrentValue.Should().Be(dt1);
+        });
+        
     }
 }
