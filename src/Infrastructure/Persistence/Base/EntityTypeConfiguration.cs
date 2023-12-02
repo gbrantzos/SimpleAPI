@@ -46,7 +46,7 @@ public abstract class EntityTypeConfiguration<TEntity, TEntityID> : IEntityTypeC
         if (typeof(TEntity).GetInterfaces().Contains(typeof(IAuditable)))
         {
             builder.Property<DateTime>(SimpleAPIContext.CreatedAt).HasColumnOrder(101);
-            builder.Property<DateTime>(SimpleAPIContext.ModifiedAt).HasColumnOrder(103);
+            builder.Property<DateTime?>(SimpleAPIContext.ModifiedAt).HasColumnOrder(103);
         }
 
         if (typeof(TEntity).GetInterfaces().Contains(typeof(ISoftDelete)))

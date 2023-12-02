@@ -1,4 +1,6 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 
 namespace SimpleAPI.Core;
 
@@ -6,6 +8,7 @@ public static class LoggingExtensions
 {
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
+        Encoder       = JavaScriptEncoder.Create(UnicodeRanges.All),
         WriteIndented = true,
     };
 

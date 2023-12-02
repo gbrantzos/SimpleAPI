@@ -3,43 +3,43 @@
 # 
 # ------------------------------------------------------------------------------
 
-# @name Get item by ID
-GET http://localhost:5800/items/4
-Content-Type: application/json
-
-<> 2023-12-01T173437.200.json
-<> 2023-12-01T172733.200.json
-###
-
 # ------------------------------------------------------------------------------
 # @name Save new item
 POST http://localhost:5800/items
 Content-Type: application/json
 
 {
-  "code": "CODE.031",
+  "code": "CODE.231",
   "description": "Testing item - Δοκιμαστικό Είδος",
-  "price": 234.2500,
+  "price": 234.25,
   "alternativeCodes": [
     {
-      "code": "ALTER.001",
+      "code": "ALTER.401",
       "kind": 1,
       "description": "Δοκιμαστικός κωδικός"
     }
   ]
 }
 
-<> 2023-12-01T172742.201.json
+> {% client.global.set("id", response.body.id); %}
 
 ###
 
 # ------------------------------------------------------------------------------
+# @name Get item by ID
+GET http://localhost:5800/items/{{id}}
+Content-Type: application/json
+
+> {% client.global.set("version", response.body.rowVersion); %}
+###
+
+# ------------------------------------------------------------------------------
 # @name Save existing item
-PUT http://localhost:5800/items/3
+PUT http://localhost:5800/items/{{id}}
 Content-Type: application/json
 
 {
-  "rowVersion": 1,
+  "rowVersion": {{version}},
   "code": "ITEM.001",
   "description": "Testing item - Modified description",
   "price": 234.2500,
@@ -52,15 +52,13 @@ Content-Type: application/json
   ]
 }
 
-<> 2023-12-01T174156.200.json
-<> 2023-12-01T174131.409.json
-
+> {% client.global.set("version", response.body.rowVersion); %}
 
 ###
 
 # ------------------------------------------------------------------------------
 # @name Delete item
-DELETE http://localhost:5800/items/2?version=1
+DELETE http://localhost:5800/items/{{id}}?version={{version}}
 Content-Type: application/json
 
 ###

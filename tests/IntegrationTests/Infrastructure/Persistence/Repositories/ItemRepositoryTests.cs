@@ -176,8 +176,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             var existingItem = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             _database.Context.Entry(existingItem).Property(SimpleAPIContext.CreatedAt).CurrentValue.Should().Be(dt1);
-            _database.Context.Entry(existingItem).Property(SimpleAPIContext.ModifiedAt).CurrentValue.Should().Be(dt1);
-
+            
             var dt2 = DateTime.Now;
             _database.TimeProviderMock.Setup(m => m.GetNow()).Returns(dt2);
 
@@ -309,6 +308,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             var item = Item.Create("Test.003", "Testing item persistence");
             repository.Add(item);
             await uow.SaveChangesAsync();
+            var modifiedAt = _database.Context.Entry(item).Property(SimpleAPIContext.ModifiedAt).CurrentValue;
             _database.Context.ChangeTracker.Clear();
 
             var dt1 = DateTime.Now;
@@ -327,6 +327,8 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 .SingleOrDefault(i => i.Code == item.Code);
             actual.Should().NotBeNull();
             _database.Context.Entry(actual!).Property(SimpleAPIContext.DeletedAt).CurrentValue.Should().Be(dt1);
+            // Modified at should not be changed
+            _database.Context.Entry(actual!).Property(SimpleAPIContext.ModifiedAt).CurrentValue.Should().Be(modifiedAt);
         });
         
     }

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using SimpleAPI.Application.Common;
 using SimpleAPI.Domain.Base;
 using SimpleAPI.Domain.Features.Items;
@@ -84,7 +83,12 @@ public class SimpleAPIContext : DbContext
             // Change created and updated timestamps
             if (entry.State == EntityState.Added)
                 entry.Property(CreatedAt).CurrentValue = _timeProvider.GetNow();
-            entry.Property(ModifiedAt).CurrentValue = _timeProvider.GetNow();
+            if (entry.State == EntityState.Modified)
+            {
+                if (entry.Entity is ISoftDelete && entry.Property<bool>(IsDeleted).CurrentValue)
+                    continue;
+                entry.Property(ModifiedAt).CurrentValue = _timeProvider.GetNow();
+            }
         }
     }
 
@@ -92,7 +96,7 @@ public class SimpleAPIContext : DbContext
     {
         var softDeleted = ChangeTracker
             .Entries<ISoftDelete>()
-            .Where(e => e.Property<bool>(SimpleAPIContext.IsDeleted).CurrentValue);
+            .Where(e => e.Property<bool>(IsDeleted).CurrentValue);
         foreach (var entry in softDeleted)
         {
             entry.Property(DeletedAt).CurrentValue = _timeProvider.GetNow();
