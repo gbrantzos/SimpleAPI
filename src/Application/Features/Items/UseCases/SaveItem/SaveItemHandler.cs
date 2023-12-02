@@ -43,6 +43,8 @@ public class SaveItemHandler : Handler<SaveItemCommand, ItemViewModel>
             item = existing;
         }
 
+        if (request.ViewModel.Code != item.Code)
+            item.ChangeCode(request.ViewModel.Code);
         item.SetPrice(Money.InEuro(request.ViewModel.Price));
         HandleAlternativeCodes(item, request.ViewModel.AlternativeCodes);
         

@@ -67,12 +67,15 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             // Act
             var existing = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException("Existing item is null");
-            existing.Description = "This a changed description";
+            var newCode = "Test.639";
+            existing.ChangeCode(newCode);
             existing.SetPrice(Money.InEuro(12432.90m));
+            existing.Description = "This a changed description";
+            
             await uow.SaveChangesAsync();
 
             // Assert
-            var actual = _database.Context.Items.Single(i => i.Code == item.Code);
+            var actual = _database.Context.Items.Single(i => i.Code == newCode);
             actual.Should().BeEquivalentTo(existing);
         });
     }

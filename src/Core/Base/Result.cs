@@ -44,6 +44,7 @@ public sealed class Result<TData>
     {
         ArgumentNullException.ThrowIfNull(dataAction);
         ArgumentNullException.ThrowIfNull(errorAction);
+        
         if (HasErrors)
             errorAction(_error ?? throw new ArgumentException(nameof(_error)));
         else

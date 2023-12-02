@@ -187,7 +187,7 @@ public class ItemEndpointsTests : IClassFixture<SimpleAPIFactory>
             """
             {
               "rowVersion": 1,
-              "code": "321",
+              "code": "ITEM.321",
               "description": "Changing item 412",
               "price": 3.32,
               "alternativeCodes": [

@@ -65,4 +65,41 @@ public class ItemTests
         // Assert
         _item.Price.Should().Be(newPrice);
     }
+
+    [Fact]
+    public void Should_change_code_to_different()
+    {
+        // Act
+        var newCode = "TEST.0098";
+        var result = _item.ChangeCode(newCode);
+
+        // Assert
+        result.Should().BeTrue();
+        _item.Code.Should().Be((ItemCode)newCode);
+
+        // Make sure new base code exists as alternative
+        var asAlternative = _item.AlternativeCodes
+            .Single(c => c.Kind == ItemAlternativeCode.CodeKind.Base);
+        asAlternative.Code.Should().Be((ItemCode)newCode);
+
+        // Make sure that new code does not exist as alternative
+        _item.AlternativeCodes
+            .Any(c => c.Code == newCode && c.Kind == ItemAlternativeCode.CodeKind.Alternative)
+            .Should()
+            .BeFalse();
+    }
+
+    [Fact]
+    public void Should_fail_to_change_code_to_used()
+    {
+        // Arrange
+        _item.AddAlternativeCode("TST.978");
+        
+        // Act
+        var newCode = "TST.978";
+        var result = _item.ChangeCode(newCode);
+
+        // Assert
+        result.Should().BeFalse();
+    }
 }

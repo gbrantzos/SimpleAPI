@@ -37,6 +37,22 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable, ISoftDelete
 
     public void SetPrice(Money price) => Price = price;
 
+    public bool ChangeCode(string code)
+    {
+        var isUsed = _alternativeCodes
+            .Any(c => c.Code == code && c.Kind == ItemAlternativeCode.CodeKind.Alternative);
+        if (isUsed) return false;
+
+        var itemCode = (ItemCode)code;
+        Code = itemCode;
+
+        var existing = _alternativeCodes.Single(c => c.Kind == ItemAlternativeCode.CodeKind.Base);
+        _alternativeCodes.Remove(existing);
+        _alternativeCodes.Add(new ItemAlternativeCode(itemCode, ItemAlternativeCode.CodeKind.Base));
+
+        return true;
+    }
+
     public void AddTag(Tag tag)
     {
         var existing = _tags.FirstOrDefault(t => t.Name == tag.Name);
@@ -80,14 +96,4 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable, ISoftDelete
 
     public ItemAlternativeCode? GetAlternativeCode(string code)
         => _alternativeCodes.FirstOrDefault(c => c.Code == code && c.Kind == ItemAlternativeCode.CodeKind.Alternative);
-}
-
-[StronglyTypedID]
-public class Tag : Entity<TagID>
-{
-    public Tag(string name) => Name = name;
-
-    public string Name { get; init; }
-
-    public override string ToString() => $"{Name} [ID {ID}]";
 }
