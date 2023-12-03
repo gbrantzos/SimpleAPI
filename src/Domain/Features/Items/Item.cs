@@ -7,14 +7,14 @@ namespace SimpleAPI.Domain.Features.Items;
 [StronglyTypedID]
 public class Item : Entity<ItemID>, IVersioned, IAuditable, ISoftDelete
 {
-    private readonly List<Tag> _tags = new List<Tag>();
+    private readonly List<Feature> _features = new();
     private readonly List<ItemAlternativeCode> _alternativeCodes = new();
 
     public int RowVersion { get; set; }
     public ItemCode Code { get; private set; }
     public string Description { get; set; }
     public Money Price { get; private set; } = Money.InEuro(0);
-    public IReadOnlyCollection<Tag> Tags => _tags.AsReadOnly();
+    public IReadOnlyCollection<Feature> Features => _features.AsReadOnly();
     public IReadOnlyCollection<ItemAlternativeCode> AlternativeCodes => _alternativeCodes.AsReadOnly();
 
     private Item(ItemCode code, string description)
@@ -53,21 +53,25 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable, ISoftDelete
         return true;
     }
 
-    public void AddTag(Tag tag)
+    public void AddFeature(Feature attribute)
     {
-        var existing = _tags.FirstOrDefault(t => t.Name == tag.Name);
+        var existing = _features.FirstOrDefault(t => t.Name == attribute.Name);
         if (existing is null)
         {
-            _tags.Add(tag);
+            _features.Add(attribute);
         }
     }
 
-    public void RemoveTag(Tag tag)
+    public void RemoveFeature(Feature attribute)
     {
-        var existing = _tags.FirstOrDefault(t => t.Name == tag.Name);
+        if (attribute == null)
+        {
+            throw new ArgumentNullException(nameof(attribute));
+        }
+        var existing = _features.FirstOrDefault(t => t.Name == attribute.Name);
         if (existing is not null)
         {
-            _tags.Remove(existing);
+            _features.Remove(existing);
         }
     }
 
@@ -96,4 +100,10 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable, ISoftDelete
 
     public ItemAlternativeCode? GetAlternativeCode(string code)
         => _alternativeCodes.FirstOrDefault(c => c.Code == code && c.Kind == ItemAlternativeCode.CodeKind.Alternative);
+}
+
+public class ItemFeature : Entity, IAuditable
+{
+    public ItemID ItemID { get; set; }
+    public FeatureID FeatureID { get; set; }
 }

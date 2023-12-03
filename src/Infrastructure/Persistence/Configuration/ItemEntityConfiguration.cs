@@ -37,13 +37,19 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
                 .HasColumnName("price_currency");
         });
 
-        builder.HasMany(p => p.Tags)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade)
-            .HasForeignKey("item_id")
-            .HasConstraintName("fk_tag__item_id")
-            .HasRelatedTableIndexName("idx_tag__item_id");
-        builder.Navigation(p => p.Tags).UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.HasMany(p => p.Features)
+            .WithMany()
+            .UsingEntity<ItemFeature>(
+                r => r.HasOne<Feature>()
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("fk_item_feature__feature_id"),
+                l => l.HasOne<Item>()
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("fk_item_feature__item_id")
+            );
+        builder.Navigation(p => p.Features).UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasMany(p => p.AlternativeCodes)
             .WithOne()

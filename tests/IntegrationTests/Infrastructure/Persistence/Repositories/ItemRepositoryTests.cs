@@ -25,9 +25,9 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         var item = Item.Create("Test.001", "Testing item persistence");
         item.SetPrice(3.2);
-        item.AddTag(new Tag("Testing 1"));
-        item.AddTag(new Tag("Testing 2"));
-        item.AddTag(new Tag("Testing 3"));
+        item.AddFeature(new Feature("Testing 1"));
+        item.AddFeature(new Feature("Testing 2"));
+        item.AddFeature(new Feature("Testing 3"));
 
         item.AddAlternativeCode("ALTER.0098");
 
@@ -231,15 +231,15 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
-            var item = Item.Create("Test.732", "Testing item with tags");
+            var item = Item.Create("Test.732", "Testing item with features");
             repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
             var existingItem = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
-            existingItem.AddTag(new Tag("Tag 1"));
-            existingItem.AddTag(new Tag("Tag 2"));
+            existingItem.AddFeature(new Feature("Feature 1"));
+            existingItem.AddFeature(new Feature("Feature 2"));
             
             existingItem.AddAlternativeCode("ALT.0098");
             existingItem.AddAlternativeCode("ALT.2098");
@@ -264,11 +264,11 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
         await _database.Context.ExecuteAndRollbackAsync(async () =>
         {
-            var item = Item.Create("Test.733", "Testing item with tags");
-            item.AddTag(new Tag("ATag 1"));
-            item.AddTag(new Tag("ATag 2"));
-            item.AddTag(new Tag("ATag 3"));
-            item.AddTag(new Tag("ATag 4"));
+            var item = Item.Create("Test.733", "Testing item with features");
+            item.AddFeature(new Feature("AFeature 1"));
+            item.AddFeature(new Feature("AFeature 2"));
+            item.AddFeature(new Feature("AFeature 3"));
+            item.AddFeature(new Feature("AFeature 4"));
 
             item.AddAlternativeCode("ALT.0098");
             item.AddAlternativeCode("ALT.2098");
@@ -281,9 +281,9 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
             var existingItem = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
-            existingItem.RemoveTag(new Tag("ATag 2"));
-            existingItem.RemoveTag(new Tag("ATag 4"));
-            existingItem.RemoveTag(new Tag("ATag 6")); // This one should not be found, but causes no issues!
+            existingItem.RemoveFeature(new Feature("AFeature 2"));
+            existingItem.RemoveFeature(new Feature("AFeature 4"));
+            existingItem.RemoveFeature(new Feature("AFeature 6")); // This one should not be found, but causes no issues!
 
             
             existingItem.RemoveAlternativeCode("ALT.0098");

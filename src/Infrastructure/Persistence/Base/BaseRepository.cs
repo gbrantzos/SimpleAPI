@@ -6,7 +6,7 @@ namespace SimpleAPI.Infrastructure.Persistence.Base;
 
 public abstract class BaseRepository<TEntity, TEntityID> : IRepository<TEntity, TEntityID>
     where TEntity : Entity<TEntityID>
-    where TEntityID : IEntityID, IEquatable<TEntityID>
+    where TEntityID : struct, IEntityID, IEquatable<TEntityID>
 {
     protected SimpleAPIContext Context { get; }
     protected virtual IReadOnlyCollection<string> DefaultDetails => Array.Empty<string>();

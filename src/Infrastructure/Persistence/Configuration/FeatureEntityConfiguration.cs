@@ -5,17 +5,14 @@ using SimpleAPI.Infrastructure.Persistence.Base;
 
 namespace SimpleAPI.Infrastructure.Persistence.Configuration;
 
-public class TagEntityConfiguration : EntityTypeConfiguration<Tag, TagID>
+public class FeatureEntityConfiguration : EntityTypeConfiguration<Feature, FeatureID>
 {
-    public TagEntityConfiguration() : base(typeof(TagID.EFValueConverter)) { }
+    public FeatureEntityConfiguration() : base(typeof(FeatureID.EFValueConverter)) { }
 
-    public override void Configure(EntityTypeBuilder<Tag> builder)
+    public override void Configure(EntityTypeBuilder<Feature> builder)
     {
-        builder.HasKey(new[] { "ID", "item_id" });
         base.Configure(builder);
         
-        builder.Property("item_id").HasColumnOrder(1);
-
         builder.Property(p => p.Name)
             .HasColumnOrder(2)
             .HasColumnName("name");

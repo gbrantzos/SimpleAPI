@@ -4,11 +4,9 @@ using SimpleAPI.Domain.Base;
 namespace SimpleAPI.Domain.Features.Items;
 
 [StronglyTypedID]
-public class Tag : Entity<TagID>
+public class Feature : Entity<FeatureID>
 {
-    public Tag(string name) => Name = name;
-
     public string Name { get; init; }
 
-    public override string ToString() => $"{Name} [ID {ID}]";
+    public Feature(string name) => Name = name.ThrowIfEmpty();
 }

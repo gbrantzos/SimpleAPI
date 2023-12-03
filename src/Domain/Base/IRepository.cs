@@ -2,7 +2,7 @@ namespace SimpleAPI.Domain.Base;
 
 public interface IRepository<TEntity, in TEntityID> 
     where TEntity : Entity<TEntityID>
-    where TEntityID : IEntityID
+    where TEntityID : struct, IEntityID
 {
     /// <summary>
     /// Get entity by ID (primary key). Returns null if no entity is found

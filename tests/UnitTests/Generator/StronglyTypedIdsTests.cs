@@ -47,7 +47,8 @@ public class StronglyTypedIdsTests
                               public readonly struct ItemID : IComparable<ItemID>, IEquatable<ItemID>, IEntityID
                               {
                                   public int Value { get; }
-                                  
+                                  public bool IsNew => Value == 0;
+                              
                                   public ItemID(int value) => Value = value;
                                   
                                   public bool Equals(ItemID other) => this.Value.Equals(other.Value);

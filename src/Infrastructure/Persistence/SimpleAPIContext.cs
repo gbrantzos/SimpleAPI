@@ -33,12 +33,13 @@ public class SimpleAPIContext : DbContext
         // Probably we need to somehow define this somewhere :(
         modelBuilder.ApplyConfiguration(new ItemEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ItemAlternativeCodesConfiguration());
-        modelBuilder.ApplyConfiguration(new TagEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ItemFeatureEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new FeatureEntityConfiguration());
 
         // If we cannot solve the previous problem we cannot use the following
         // modelBuilder.ApplyConfigurationsFromAssembly(typeof(SimpleAPIContext).Assembly);
     }
-
+    
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = new())
     {

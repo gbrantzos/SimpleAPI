@@ -8,6 +8,7 @@ public class EntityTests
     private class SimpleID : IEntityID
     {
         public int Value { get; init; }
+        public bool IsNew { get; } = false;
     }
 
     [Fact]

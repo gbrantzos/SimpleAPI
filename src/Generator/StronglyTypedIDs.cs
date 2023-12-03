@@ -75,7 +75,8 @@ public class StronglyTypedIDs : IIncrementalGenerator
                  public readonly struct {{symbolName}}ID : IComparable<{{symbolName}}ID>, IEquatable<{{symbolName}}ID>, IEntityID
                  {
                      public int Value { get; }
-                     
+                     public bool IsNew => Value == 0;
+                 
                      public {{symbolName}}ID(int value) => Value = value;
                      
                      public bool Equals({{symbolName}}ID other) => this.Value.Equals(other.Value);
