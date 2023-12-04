@@ -1,6 +1,6 @@
 namespace SimpleAPI.Domain.Base;
 
-public interface IRepository<TEntity, in TEntityID> 
+public interface IRepository<TEntity, in TEntityID>
     where TEntity : Entity<TEntityID>
     where TEntityID : struct, IEntityID
 {
@@ -18,11 +18,18 @@ public interface IRepository<TEntity, in TEntityID>
     /// <param name="entity">Entity instance to add</param>
     /// <returns></returns>
     void Add(TEntity entity);
-    
+
     /// <summary>
     /// Mark entity for deletion
     /// </summary>
     /// <param name="entity">Entity instance to delete</param>
     void Delete(TEntity entity);
-}
 
+    /// <summary>
+    /// Search for entities using the specified <see cref="SearchCriteria{T}"/>
+    /// </summary>
+    /// <param name="criteria">Query specification, details to include and sorting</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns></returns>
+    Task<QueryResult<TEntity>> FindAsync(SearchCriteria<TEntity> criteria, CancellationToken cancellationToken = default);
+}

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using SimpleAPI.Domain.Base;
 using SimpleAPI.Domain.Features.Common;
 using SimpleAPI.Domain.Features.Items;
 using SimpleAPI.Infrastructure.Persistence;
@@ -71,7 +72,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             existing.ChangeCode(newCode);
             existing.SetPrice(Money.InEuro(12432.90m));
             existing.Description = "This a changed description";
-            
+
             await uow.SaveChangesAsync();
 
             // Assert
@@ -179,7 +180,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             var existingItem = await repository.GetByIDAsync(item.ID) ??
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             _database.Context.Entry(existingItem).Property(SimpleAPIContext.CreatedAt).CurrentValue.Should().Be(dt1);
-            
+
             var dt2 = DateTime.Now;
             _database.TimeProviderMock.Setup(m => m.GetNow()).Returns(dt2);
 
@@ -240,12 +241,12 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 throw new InvalidOperationException($"Could not find item with ID {item.ID}");
             existingItem.AddFeature(new Feature("Feature 1"));
             existingItem.AddFeature(new Feature("Feature 2"));
-            
+
             existingItem.AddAlternativeCode("ALT.0098");
             existingItem.AddAlternativeCode("ALT.2098");
             existingItem.AddAlternativeCode("ALT.2098");
             existingItem.AddAlternativeCode("MAK.7098");
-            
+
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
@@ -274,7 +275,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             item.AddAlternativeCode("ALT.2098");
             item.AddAlternativeCode("ALT.2098");
             item.AddAlternativeCode("MAK.7098");
-            
+
             repository.Add(item);
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
@@ -285,10 +286,10 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             existingItem.RemoveFeature(new Feature("AFeature 4"));
             existingItem.RemoveFeature(new Feature("AFeature 6")); // This one should not be found, but causes no issues!
 
-            
+
             existingItem.RemoveAlternativeCode("ALT.0098");
             existingItem.RemoveAlternativeCode("ALT.2098");
-            
+
             await uow.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
 
@@ -333,6 +334,42 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             // Modified at should not be changed
             _database.Context.Entry(actual!).Property(SimpleAPIContext.ModifiedAt).CurrentValue.Should().Be(modifiedAt);
         });
-        
+    }
+
+    [Fact]
+    public async Task Should_find_using_search_criteria()
+    {
+        // Arrange
+        var repository = new ItemRepository(_database.Context);
+
+        await _database.Context.ExecuteAndRollbackAsync(async () =>
+        {
+            var items = new List<Item>
+            {
+                Item.Create("Code.001", "Item 001"),
+                Item.Create("Code.002", "Item 002"),
+                Item.Create("Code.003", "Item 003"),
+                Item.Create("Code.004", "Item 004"),
+                Item.Create("Code.005", "Item 005")
+            };
+            items[4].SetPrice(Money.InEuro(23));
+            items[4].AddAlternativeCode("ALTER.987");
+            
+            _database.Context.AddRange(items);
+            await _database.Context.SaveChangesAsync();
+            _database.Context.ChangeTracker.Clear();
+
+            var searchCriteria = new SearchCriteria<Item>(
+                specification: new Specification<Item>(i => i.ID >= new ItemID(3)),
+                include: new string[] { "AlternativeCodes" },
+                orderBy: new Sorting<Item>(i => i.Code, Sorting.SortDirection.Descending)
+            );
+
+            // Act 
+            var actual = await repository.FindAsync(searchCriteria);
+
+            // Assert
+            actual.Should().NotBeNull();
+        });
     }
 }

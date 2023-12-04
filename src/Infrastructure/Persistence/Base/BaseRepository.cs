@@ -43,6 +43,46 @@ public abstract class BaseRepository<TEntity, TEntityID> : IRepository<TEntity, 
         Context.Set<TEntity>().Remove(entity);
     }
 
+    public async Task<QueryResult<TEntity>> FindAsync(SearchCriteria<TEntity> criteria, CancellationToken cancellationToken = default)
+    {
+        var dbSet = DbSetWithDetails(Context.Set<TEntity>(), criteria.Include);
+        var query = dbSet.Where(criteria.Specification.Expression);
+        var sortedQuery = AddSorting(query, criteria.OrderBy);
+
+        var results = await sortedQuery
+            .TagWith($"{RepositoryName} :: {nameof(FindAsync)}")
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return new QueryResult<TEntity>(results);
+    }
+
     private static IQueryable<TEntity> DbSetWithDetails(IQueryable<TEntity> query, IEnumerable<string> details)
         => details.Aggregate(query, (current, detail) => current.Include(detail));
+
+    private static IOrderedQueryable<TEntity> AddSorting(IQueryable<TEntity> query, IEnumerable<Sorting<TEntity>> sorting)
+    {
+        var sortingList = sorting.ToList();
+        if (sortingList.Count == 0)
+            return query.OrderBy(e => e.ID);
+
+        IOrderedQueryable<TEntity>? sortedQuery = null;
+        foreach (var sort in sortingList)
+        {
+            if (sort.OrderBy is null) continue;
+
+            sortedQuery = sort.Direction switch
+            {
+                Sorting.SortDirection.Ascending => sortedQuery is null
+                    ? query.OrderBy(sort.OrderBy)
+                    : sortedQuery.ThenBy(sort.OrderBy),
+                Sorting.SortDirection.Descending => sortedQuery is null
+                    ? query.OrderByDescending(sort.OrderBy)
+                    : sortedQuery.ThenByDescending(sort.OrderBy),
+                _ => throw new ArgumentException($"Unsupported sorting direction {sort}")
+            };
+        }
+
+        return sortedQuery!;
+    }
 }
