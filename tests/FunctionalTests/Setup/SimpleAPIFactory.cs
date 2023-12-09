@@ -1,9 +1,12 @@
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SimpleAPI.Application.Common;
 using SimpleAPI.Infrastructure.Persistence;
@@ -20,50 +23,49 @@ public class SimpleAPIFactory : WebApplicationFactory<Program>
         _connection = new SqliteConnection("Filename=:memory:");
         _connection.Open();
     }
-    
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureServices(services =>
+        builder.ConfigureTestServices(services =>
         {
-            // Remove the app's database  registration.
-            var serviceDescriptor = services
-                .SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<SimpleAPIContext>));
-            
-            if (serviceDescriptor != null)
-            {
-                services.Remove(serviceDescriptor);
-            }
-            
+            // Change the app's database registration.
+            services.RemoveAll(typeof(DbContextOptions<SimpleAPIContext>));
             services.AddDbContext<SimpleAPIContext>(options =>
             {
                 options.UseSqlite(_connection);
             });
-            
-            var sp = services.BuildServiceProvider();
-            using var scope = sp.CreateScope();
-            var scopedServices = scope.ServiceProvider;
-            var db = scopedServices.GetRequiredService<SimpleAPIContext>();
-            var logger = scopedServices.GetRequiredService<ILogger<SimpleAPIFactory>>();
-
-            db.Database.EnsureCreated();
-            try
-            {
-                //Utilities.InitializeDbForTests(db);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error occurred while initializing test database: {Message}", ex.Message);
-            }
         });
     }
-    
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        var host = base.CreateHost(builder);
+
+        using var scope = host.Services.CreateScope();
+        var scopedServices = scope.ServiceProvider;
+        var logger = scopedServices.GetRequiredService<ILogger<SimpleAPIFactory>>();
+        var context = scopedServices.GetRequiredService<SimpleAPIContext>();
+
+        context.Database.EnsureCreated();
+        try
+        {
+            //Utilities.InitializeDbForTests(db);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while initializing test database: {Message}", ex.Message);
+        }
+
+        return host;
+    }
+
     protected override void ConfigureClient(HttpClient client)
     {
         base.ConfigureClient(client);
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
-    public SimpleAPIContext GetContext()
+    public SimpleAPIContext GetSqliteContext()
     {
         var options = new DbContextOptionsBuilder<SimpleAPIContext>()
             .UseSqlite(_connection)
