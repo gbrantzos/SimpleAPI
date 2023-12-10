@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.OpenApi.Models;
 using SimpleAPI.Web.ErrorMapping;
 using SimpleAPI.Web.Setup.Context;
 using SimpleAPI.Web.Setup.Environment;
@@ -24,12 +25,30 @@ public static class DependencyInjection
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
+        var html = 
+            $"""
+            <div><label>Environment</label>{environment.AspNetCoreEnvironment}<div/>
+            <div><label>Version    </label>{environment.BuildInformation.Version}<div/>
+            <div><label>Commit     </label>{environment.BuildInformation.Commit}<div/>
+            <div><label>Build at   </label>{environment.BuildInformation.BuildAt} - <b>{environment.BuildInformation.Mode}</b><div/>
+            """;
+        
         services
             .AddEndpointsApiExplorer()
             .AddHttpContextAccessor()
             .AddProblemDetails(options => options.CustomizeProblemDetails = ErrorMapper.CustomizeProblemDetails)
-            .AddSwaggerGen();
-
+            .AddSwaggerGen(options =>
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version     = "v1",
+                    Title       = "Simple API",
+                    Description = $"""
+                                  Simple REST API sample over a CRUD application to \"gather\" best practices and techniques.
+                                  <hr/>
+                                  {html}
+                                  """
+                })
+            );
         services.AddSingleton(environment);
         services.AddSingleton<RequestContextProvider>();
         services.AddSingleton<RequestContextEnricher>();

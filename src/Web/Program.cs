@@ -15,7 +15,7 @@ builder.Services
     .AddHostServices(environment);
 
 var app = builder.Build();
-app.ConfigurePipeline(app.Environment);
+app.ConfigurePipeline(builder.Environment);
 app.MapEndpoints(builder.Configuration);
 
 app.Run();

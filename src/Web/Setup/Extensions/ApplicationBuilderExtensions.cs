@@ -30,6 +30,20 @@ public static class ApplicationBuilderExtensions
             builder.UseSwagger();
             builder.UseSwaggerUI(options =>
             {
+                options.HeadContent = """
+                                      <style>
+                                        .description {
+                                            font-size: smaller;
+                                        }
+                                        .description label {
+                                          width: 100px;
+                                          display: inline-block;
+                                          margin: 0 0 3px 0;
+                                        }
+                                      </style>
+                                      """;
+                options.DocumentTitle = "Simple API";
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Simple API - v1");
                 options.DocExpansion(DocExpansion.List);
                 options.DefaultModelsExpandDepth(-1);
             });
