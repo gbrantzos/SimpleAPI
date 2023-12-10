@@ -39,7 +39,7 @@ public static class EndpointRouteBuilderExtensions
                     throw new InvalidOperationException("Could not read favicon.ico!");
                 var data = new byte[favIcon.Length];
                 _ = await favIcon.ReadAsync(data.AsMemory(0, data.Length));
-                context.Response.Headers.Add("Content-Type", "image/png");
+                context.Response.Headers.Append("Content-Type", "image/png");
                 await context.Response.Body.WriteAsync(data);
             });
         

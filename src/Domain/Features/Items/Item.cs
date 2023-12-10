@@ -1,4 +1,5 @@
 using SimpleAPI.Core;
+using SimpleAPI.Core.Guards;
 using SimpleAPI.Domain.Base;
 using SimpleAPI.Domain.Features.Common;
 
@@ -64,10 +65,7 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable, ISoftDelete
 
     public void RemoveFeature(Feature attribute)
     {
-        if (attribute == null)
-        {
-            throw new ArgumentNullException(nameof(attribute));
-        }
+        Ensure.NotNull(attribute);
         var existing = _features.FirstOrDefault(t => t.Name == attribute.Name);
         if (existing is not null)
         {

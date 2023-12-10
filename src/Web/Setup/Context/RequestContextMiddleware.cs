@@ -19,7 +19,7 @@ public class RequestContextMiddleware
         Ensure.NotNull(context);
         
         _contextProvider.CurrentContext = RequestContext.Create();
-        context.Response.Headers.Add("X-Request-StartedOn", _contextProvider.CurrentContext.StartedOn.ToLongDateString());
+        context.Response.Headers.Append("X-Request-StartedOn", _contextProvider.CurrentContext.StartedOn.ToLongDateString());
         await _next(context);
         _contextProvider.CurrentContext = null;
     }

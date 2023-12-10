@@ -67,7 +67,7 @@ public class ErrorMapper
     {
         var requestContextProvider = context.HttpContext.RequestServices.GetRequiredService<RequestContextProvider>();
         var executionID = requestContextProvider.CurrentContext?.ExecutionID;
-        if (executionID is not null)
+        if (executionID is not null && !context.ProblemDetails.Extensions.ContainsKey(ExecutionID))
         {
             context.ProblemDetails.Extensions.Add(ExecutionID, executionID);
         }

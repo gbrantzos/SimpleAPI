@@ -25,29 +25,29 @@ public class ItemEndpoints : IEndpointMapper
         group.MapGet("{id}", GetItem.Handle)
             .WithName("GetItem")
             .WithSummary("Get item by ID")
-            .WithDescription("Retrieve an item by its ID.");
+            .WithDescription("Retrieve an item by its ID.")
+            .Produces<ItemViewModel>(200, "application/json");
         group.MapPost("", SaveItem.Handle)
             .WithName("SaveItem")
             .WithSummary("Save new item")
             .Produces<ItemViewModel>(200, "application/json");
-            // .WithOpenApi(op =>
-            // {
-            //     var example = new OpenApiExample
-            //     {
-            //         Summary     = "Example",
-            //         Description = "This is an example value",
-            //         Value       = new OpenApiString("{\"id\": 1}"),
-            //     };
-            //     op.Responses["200"].Content["application/json"].Examples.Add("base", example);
-            //     return op;
-            // });
+        // .WithOpenApi(op =>
+        // {
+        //     var example = new OpenApiExample
+        //     {
+        //         Summary     = "Example",
+        //         Description = "This is an example value",
+        //         Value       = new OpenApiString("{\"id\": 1}"),
+        //     };
+        //     op.Responses["200"].Content["application/json"].Examples.Add("base", example);
+        //     return op;
+        // });
         group.MapPut("{id}", UpdateItem.Handle)
             .WithName("UpdateItem")
             .WithSummary("Update existing item");
         group.MapDelete("{id}", DeleteItem.Handle)
             .WithName("DeleteItem")
             .WithSummary("Delete item by ID");
-
     }
 
     private static class GetItem
@@ -77,11 +77,13 @@ public class ItemEndpoints : IEndpointMapper
         {
             var response = await mediator.Send(new SaveItemCommand(item), cancellationToken);
 
-            return response.Match(vm =>
-            {
-                var location = $"/items/{vm.ID}";
-                return Results.Created(location, vm);
-            }, error => Results.Problem(errorMapper.MapToProblemDetails(error)));
+            return response.Match(
+                vm =>
+                {
+                    var location = $"/items/{vm.ID}";
+                    return Results.Created(location, vm);
+                },
+                error => Results.Problem(errorMapper.MapToProblemDetails(error)));
         }
     }
 
@@ -112,8 +114,8 @@ public class ItemEndpoints : IEndpointMapper
         {
             var response = await mediator.Send(new DeleteItemCommand(id, rowVersion), cancellationToken);
 
-            return response.Match(_ =>
-                    Results.NoContent(),
+            return response.Match(
+                _ => Results.NoContent(),
                 error => Results.Problem(errorMapper.MapToProblemDetails(error))
             );
         }

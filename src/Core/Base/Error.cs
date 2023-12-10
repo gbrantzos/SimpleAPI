@@ -23,6 +23,8 @@ public sealed class Error
             Details = new Dictionary<string, object?>(details);
         }
     }
+
+    public override string ToString() => $"{Kind} | {Message}";
     
     public static Error Create(ErrorKind kind, string message)
         => new Error(kind, message);

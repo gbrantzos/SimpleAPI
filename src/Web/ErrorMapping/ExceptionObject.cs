@@ -24,7 +24,7 @@ public sealed class ExceptionObject
             InnerException = new ExceptionObject(innerException);
     }
 
-    private static IEnumerable<string> GetInnerExceptionMessages(Exception x)
+    private static List<string> GetInnerExceptionMessages(Exception x)
     {
         var innerMessages = new List<string>();
         var inner = x.InnerException;
