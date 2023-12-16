@@ -362,9 +362,9 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             var searchCriteria = new SearchCriteria<Item>(
                 specification: new Specification<Item>(i => i.ID >= new ItemID(3)),
                 include: new string[] { "AlternativeCodes" },
-                orderBy: new Sorting<Item>(i => i.Code, Sorting.SortDirection.Descending)
+                sorting: new Sorting<Item>(i => i.Code, Sorting.SortDirection.Descending)
             );
-
+            
             // Act 
             var actual = await repository.FindAsync(searchCriteria);
 

@@ -27,7 +27,14 @@ DELETE	/items/{id}		+ version query parameter (row version)
 GET		/items/{query}	+ query parameters (using specific SQL query + filtering, sorting , paging)
 
 
-
+Searching:
+- Based on query parameters
+- Follow the pattern: field:operator=value
+- Field can appear multiple times (i.e in clauses)
+- Sorting defined as sort=(+|-)field, can define multiple sort fields
+- Paging defined as offset && limit
+- To specify details use include=detail_name
+- To use sort offset and limit as fields surround them with brackets, i.e [offset]=value
 
 ## For arrays:
 

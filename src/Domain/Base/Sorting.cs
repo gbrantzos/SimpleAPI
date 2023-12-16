@@ -22,4 +22,6 @@ public class Sorting<T> : Sorting
         OrderBy   = orderBy;
         Direction = direction;
     }
+
+    public override string ToString() => $"{OrderBy}, {Direction}";
 }

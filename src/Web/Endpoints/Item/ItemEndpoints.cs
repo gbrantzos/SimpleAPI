@@ -7,7 +7,9 @@ using Microsoft.OpenApi.Models;
 using SimpleAPI.Application.Features.Items.UseCases.DeleteItem;
 using SimpleAPI.Application.Features.Items.UseCases.GetItem;
 using SimpleAPI.Application.Features.Items.UseCases.SaveItem;
+using SimpleAPI.Application.Features.Items.UseCases.SearchItems;
 using SimpleAPI.Application.Features.Items.ViewModels;
+using SimpleAPI.Domain.Base;
 using SimpleAPI.Web.ErrorMapping;
 
 namespace SimpleAPI.Web.Endpoints.Item;
@@ -22,6 +24,10 @@ public class ItemEndpoints : IEndpointMapper
             .WithTags("Items")
             .WithOpenApi();
 
+        group.MapGet("/", SearchItem.Handle)
+            .WithName("SearchItems")
+            .WithSummary("Search items")
+            .WithDescription("Retrieve all items using the specified search criteria from query parameters.");
         group.MapGet("{id}", GetItem.Handle)
             .WithName("GetItem")
             .WithSummary("Get item by ID")
@@ -116,6 +122,23 @@ public class ItemEndpoints : IEndpointMapper
 
             return response.Match(
                 _ => Results.NoContent(),
+                error => Results.Problem(errorMapper.MapToProblemDetails(error))
+            );
+        }
+    }
+    
+    private static class SearchItem
+    {
+        public static async Task<IResult> Handle(HttpRequest request,
+            IMediator mediator,
+            ErrorMapper errorMapper,
+            CancellationToken cancellationToken)
+        {
+            var queryParams = (request.QueryString.Value ?? "?")[1..];
+            var response = await mediator.Send(new SearchItemsQuery(queryParams));
+
+            return response.Match(
+                list => Results.Ok(list),
                 error => Results.Problem(errorMapper.MapToProblemDetails(error))
             );
         }

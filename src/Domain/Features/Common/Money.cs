@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using SimpleAPI.Core.Base;
 
@@ -16,7 +15,6 @@ public enum Currency
     USD = 840
 }
 
-[SuppressMessage("Design", "CA1036:Override methods on comparable types")]
 public class Money : ValueObject
 {
     public decimal Amount { get; }

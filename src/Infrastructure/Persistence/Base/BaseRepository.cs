@@ -47,7 +47,7 @@ public abstract class BaseRepository<TEntity, TEntityID> : IRepository<TEntity, 
     {
         var dbSet = DbSetWithDetails(Context.Set<TEntity>(), criteria.Include);
         var query = dbSet.Where(criteria.Specification.Expression);
-        var sortedQuery = AddSorting(query, criteria.OrderBy);
+        var sortedQuery = AddSorting(query, criteria.Sorting);
 
         var results = await sortedQuery
             .TagWith($"{RepositoryName} :: {nameof(FindAsync)}")

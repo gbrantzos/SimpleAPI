@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -29,6 +30,23 @@ public static class Ensure
         string? parameterName = null,
         string? message = null)
         => parameter.ThrowIfEmpty();
+
+    /// <summary>
+    /// Ensure given parameter (IEnumerable) is not empty
+    /// </summary>
+    /// <param name="parameter"></param>
+    /// <param name="parameterName"></param>
+    /// <param name="message"></param>
+    public static void NotEmpty<T>(IEnumerable<T> parameter,
+        [CallerArgumentExpression("parameter")]
+        string? parameterName = null,
+        string? message = null)
+    {
+        if (!parameter.Any())
+        {
+            throw new ArgumentException(message ?? $"{parameterName} cannot be empty", parameterName);
+        }
+    }
 
     /// <summary>
     /// Ensure that given condition is true
