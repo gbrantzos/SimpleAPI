@@ -15,8 +15,8 @@ public class Item : Entity<ItemID>, IVersioned, IAuditable, ISoftDelete
     public ItemCode Code { get; private set; }
     public string Description { get; set; }
     public Money Price { get; private set; } = Money.InEuro(0);
-    public IReadOnlyCollection<Feature> Features => _features.AsReadOnly();
-    public IReadOnlyCollection<ItemAlternativeCode> AlternativeCodes => _alternativeCodes.AsReadOnly();
+    public IReadOnlyList<Feature> Features => _features.AsReadOnly();
+    public IReadOnlyList<ItemAlternativeCode> AlternativeCodes => _alternativeCodes.AsReadOnly();
 
     private Item(ItemCode code, string description)
     {

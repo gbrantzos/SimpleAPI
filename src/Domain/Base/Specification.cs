@@ -94,7 +94,7 @@ public static class Specification
         return new Specification<T>(finalExpr);
     }
 
-    private class ParameterReplacer : ExpressionVisitor
+    private sealed class ParameterReplacer : ExpressionVisitor
     {
         private readonly ParameterExpression _parameter;
 

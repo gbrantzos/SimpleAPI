@@ -32,7 +32,7 @@ public class SearchCriteria<T>
 
 public static class SearchCriteria
 {
-    private record Condition(string Field, string Operator, string Value);
+    private sealed record Condition(string Field, string Operator, string Value);
 
     private static readonly HashSet<string> KnownOperators = new HashSet<string>
     {

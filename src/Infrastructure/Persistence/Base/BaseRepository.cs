@@ -43,7 +43,16 @@ public abstract class BaseRepository<TEntity, TEntityID> : IRepository<TEntity, 
         Context.Set<TEntity>().Remove(entity);
     }
 
-    public async Task<QueryResult<TEntity>> FindAsync(SearchCriteria<TEntity> criteria, CancellationToken cancellationToken = default)
+    public Task<int> CountAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default) 
+        => Context
+            .Set<TEntity>()
+            .Where(specification.Expression)
+            .TagWith($"{RepositoryName} :: {nameof(CountAsync)}")
+            .AsNoTracking()
+            .CountAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<TEntity>> FindAsync(SearchCriteria<TEntity> criteria, 
+        CancellationToken cancellationToken = default)
     {
         var dbSet = DbSetWithDetails(Context.Set<TEntity>(), criteria.Include);
         var query = dbSet.Where(criteria.Specification.Expression);
@@ -54,7 +63,7 @@ public abstract class BaseRepository<TEntity, TEntityID> : IRepository<TEntity, 
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        return new QueryResult<TEntity>(results);
+        return results;
     }
 
     private static IQueryable<TEntity> DbSetWithDetails(IQueryable<TEntity> query, IEnumerable<string> details)

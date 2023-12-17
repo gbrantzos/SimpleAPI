@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using SimpleAPI.Application.Features.Items.UseCases.DeleteItem;
+using SimpleAPI.Application.Features.Items.UseCases.FindItems;
 using SimpleAPI.Application.Features.Items.UseCases.GetItem;
 using SimpleAPI.Application.Features.Items.UseCases.SaveItem;
-using SimpleAPI.Application.Features.Items.UseCases.SearchItems;
 using SimpleAPI.Application.Features.Items.ViewModels;
 using SimpleAPI.Domain.Base;
 using SimpleAPI.Web.ErrorMapping;
@@ -135,7 +135,7 @@ public class ItemEndpoints : IEndpointMapper
             CancellationToken cancellationToken)
         {
             var queryParams = (request.QueryString.Value ?? "?")[1..];
-            var response = await mediator.Send(new SearchItemsQuery(queryParams));
+            var response = await mediator.Send(new FindItemsQuery(queryParams), cancellationToken);
 
             return response.Match(
                 list => Results.Ok(list),

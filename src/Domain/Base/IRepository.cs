@@ -31,5 +31,13 @@ public interface IRepository<TEntity, in TEntityID>
     /// <param name="criteria">Query specification, details to include and sorting</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns></returns>
-    Task<QueryResult<TEntity>> FindAsync(SearchCriteria<TEntity> criteria, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<TEntity>> FindAsync(SearchCriteria<TEntity> criteria, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Count entities that satisfy the given specification. Useful for paged results.
+    /// </summary>
+    /// <param name="specification"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<int> CountAsync(Specification<TEntity> specification, CancellationToken cancellationToken = default);
 }
