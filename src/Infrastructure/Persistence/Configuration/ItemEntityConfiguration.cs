@@ -26,7 +26,7 @@ public class ItemEntityConfiguration : EntityTypeConfiguration<Item, ItemID>
             .HasColumnName("description")
             .IsRequired();
 
-        builder.OwnsOne(p => p.Price, priceBuilder =>
+        builder.ComplexProperty(p => p.Price, priceBuilder =>
         {
             priceBuilder.Property(a => a.Amount)
                 .HasColumnName("price_amount")
