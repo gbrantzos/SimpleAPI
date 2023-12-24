@@ -9,7 +9,7 @@ public abstract class BaseRepository<TEntity, TEntityID> : IRepository<TEntity, 
     where TEntityID : struct, IEntityID, IEquatable<TEntityID>
 {
     protected SimpleAPIContext Context { get; }
-    protected virtual IReadOnlyCollection<string> DefaultDetails => Array.Empty<string>();
+    protected virtual IEnumerable<string> DefaultDetails => Array.Empty<string>();
     protected string RepositoryName => this.GetType().Name;
 
     protected BaseRepository(SimpleAPIContext context)
@@ -57,13 +57,11 @@ public abstract class BaseRepository<TEntity, TEntityID> : IRepository<TEntity, 
         var dbSet = DbSetWithDetails(Context.Set<TEntity>(), criteria.Include);
         var query = dbSet.Where(criteria.Specification.Expression);
         var sortedQuery = AddSorting(query, criteria.Sorting);
-
-        var results = await sortedQuery
-            .TagWith($"{RepositoryName} :: {nameof(FindAsync)}")
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
-        return results;
+        var finalQuery = sortedQuery.TagWith($"{RepositoryName} :: {nameof(FindAsync)}");
+            
+        return criteria.ForUpdate
+            ? await finalQuery.ToListAsync(cancellationToken)
+            : await finalQuery.AsNoTracking().ToListAsync(cancellationToken);
     }
 
     private static IQueryable<TEntity> DbSetWithDetails(IQueryable<TEntity> query, IEnumerable<string> details)

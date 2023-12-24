@@ -354,7 +354,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             };
             items[4].SetPrice(Money.InEuro(23));
             items[4].AddAlternativeCode("ALTER.987");
-            
+
             _database.Context.AddRange(items);
             await _database.Context.SaveChangesAsync();
             _database.Context.ChangeTracker.Clear();
@@ -363,9 +363,9 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 specification: new Specification<Item>(i => i.ID >= new ItemID(3) && i.Price.Amount >= 3.14m),
                 //specification: new Specification<Item>(i => i.AlternativeCodes.Any(a => a.Code == "12")),
                 include: new string[] { "AlternativeCodes" },
-                sorting: new Sorting<Item>(i => i.Code, Sorting.SortDirection.Descending)
+                sorting: new[] { new Sorting<Item>(i => i.Code, Sorting.SortDirection.Descending) }
             );
-            
+
             // Act 
             var actual = await repository.FindAsync(searchCriteria);
 

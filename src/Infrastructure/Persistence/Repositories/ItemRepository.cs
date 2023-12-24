@@ -5,7 +5,11 @@ namespace SimpleAPI.Infrastructure.Persistence.Repositories;
 
 public class ItemRepository : BaseRepository<Item, ItemID>, IItemRepository
 {
-    protected override IReadOnlyCollection<string> DefaultDetails => new[] { nameof(Item.Features), nameof(Item.AlternativeCodes) };
+    protected override IEnumerable<string> DefaultDetails => new[]
+    {
+        nameof(Item.Features),
+        nameof(Item.AlternativeCodes)
+    };
 
     public ItemRepository(SimpleAPIContext context) : base(context) { }
 }

@@ -10,22 +10,18 @@ public class SearchCriteria<T>
     public Specification<T> Specification { get; }
     public IEnumerable<string> Include { get; }
     public IEnumerable<Sorting<T>> Sorting { get; }
+    public bool ForUpdate { get; }
 
     public SearchCriteria(Specification<T>? specification = null,
         IEnumerable<string>? include = null,
-        IEnumerable<Sorting<T>>? sorting = null)
+        IEnumerable<Sorting<T>>? sorting = null,
+        bool forUpdate = false)
     {
+        ForUpdate     = forUpdate;
         Specification = specification ?? Specification<T>.True;
         Include       = include ?? Enumerable.Empty<string>();
         Sorting       = sorting ?? Enumerable.Empty<Sorting<T>>();
     }
-
-    public SearchCriteria(Specification<T>? specification = null,
-        IEnumerable<string>? include = null,
-        Sorting<T>? sorting = null) : this(
-        specification,
-        include,
-        sorting is null ? null : new[] { sorting }) { }
 }
 
 public static class SearchCriteria
@@ -179,7 +175,7 @@ public static class SearchCriteria
             if (!KnownOperators.Contains(condition.Operator))
                 throw new ArgumentException($"Unsupported operator: {condition.Operator}");
 
-            var result = condition.Operator == "in" || condition.Operator == "nin"
+            var result = condition.Operator is "in" or "nin"
                 ? MultiExpressionForCondition<T>(condition, prop)
                 : SingleExpressionForCondition<T>(condition, prop);
             specifications.Add(new Specification<T>(result));
