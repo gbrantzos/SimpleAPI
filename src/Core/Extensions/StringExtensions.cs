@@ -85,5 +85,7 @@ public static class StringExtensions
         if (string.IsNullOrEmpty(value)) return value;
         return char.ToLowerInvariant(value[0]) + value.Substring(1);
     }
+
+    public static string? NullIfEmpty(this string? value) => String.IsNullOrEmpty(value) ? null : value;
 }
 

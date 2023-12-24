@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+using System.Web;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +9,7 @@ using SimpleAPI.Application.Features.Items.UseCases.FindItems;
 using SimpleAPI.Application.Features.Items.UseCases.GetItem;
 using SimpleAPI.Application.Features.Items.UseCases.SaveItem;
 using SimpleAPI.Application.Features.Items.ViewModels;
-using SimpleAPI.Domain.Base;
+using SimpleAPI.Core;
 using SimpleAPI.Web.ErrorMapping;
 
 namespace SimpleAPI.Web.Endpoints.Item;
@@ -27,6 +27,30 @@ public class ItemEndpoints : IEndpointMapper
         group.MapGet("/", SearchItem.Handle)
             .WithName("SearchItems")
             .WithSummary("Search items")
+            .WithOpenApi(operation =>
+            {
+                operation.Parameters.Add(new OpenApiParameter()
+                {
+                    Name        = "search",
+                    Description = "Search criteria",
+                    In          = ParameterLocation.Query,
+                    Schema = new OpenApiSchema()
+                    {
+                        Type                 = "object",
+                        AdditionalProperties = new OpenApiSchema() { Type = "string" }
+                    },
+                    Explode = true,
+                    Style   = ParameterStyle.Form,
+                    Example = new OpenApiString("""
+                                                {
+                                                  "sort": "-description",
+                                                  "include": "AlternativeCodes",
+                                                  "code": "CODE.231"
+                                                }
+                                                """)
+                });
+                return operation;
+            })
             .WithDescription("Retrieve all items using the specified search criteria from query parameters.");
         group.MapGet("{id}", GetItem.Handle)
             .WithName("GetItem")
@@ -126,7 +150,7 @@ public class ItemEndpoints : IEndpointMapper
             );
         }
     }
-    
+
     private static class SearchItem
     {
         public static async Task<IResult> Handle(HttpRequest request,
@@ -134,8 +158,9 @@ public class ItemEndpoints : IEndpointMapper
             ErrorMapper errorMapper,
             CancellationToken cancellationToken)
         {
-            var queryParams = (request.QueryString.Value ?? "?")[1..];
-            var response = await mediator.Send(new FindItemsQuery(queryParams), cancellationToken);
+            var queryParams = (request.QueryString.Value.NullIfEmpty() ?? "?")[1..];
+            var decodedParams = HttpUtility.UrlDecode(queryParams);
+            var response = await mediator.Send(new FindItemsQuery(decodedParams), cancellationToken);
 
             return response.Match(
                 list => Results.Ok(list),
