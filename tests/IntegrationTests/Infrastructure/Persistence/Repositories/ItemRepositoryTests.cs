@@ -360,7 +360,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             _database.Context.ChangeTracker.Clear();
 
             var searchCriteria = new SearchCriteria<Item>(
-                specification: new Specification<Item>(i => i.ID >= new ItemID(3)),
+                specification: new Specification<Item>(i => i.ID >= new ItemID(3) && i.Price.Amount >= 3.14m),
                 //specification: new Specification<Item>(i => i.AlternativeCodes.Any(a => a.Code == "12")),
                 include: new string[] { "AlternativeCodes" },
                 sorting: new Sorting<Item>(i => i.Code, Sorting.SortDirection.Descending)

@@ -4,7 +4,7 @@ namespace SimpleAPI.Core.Base;
 // https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects
 // https://github.com/vkhorikov/CSharpFunctionalExtensions/blob/master/CSharpFunctionalExtensions/ValueObject/ValueObject.cs
 
-public abstract class ValueObject : IComparable<ValueObject>
+public abstract class ValueObject : IComparable<ValueObject>, IEquatable<ValueObject>
 {
     /// <summary>
     /// Get value object members for equality
@@ -15,11 +15,17 @@ public abstract class ValueObject : IComparable<ValueObject>
     #region Overrides from Object class
     public override bool Equals(object? obj)
     {
-        if (obj is null || obj.GetType() != GetType())
+        // Based on implementation found on "More Effective C#" book
+        if (ReferenceEquals(obj, null))
             return false;
 
-        var valueObject = (ValueObject)obj;
-        return GetEqualityComponents().SequenceEqual(valueObject.GetEqualityComponents());
+        if (ReferenceEquals(obj, this))
+            return true;
+        
+        if (obj.GetType() != GetType())
+            return false;
+
+        return this.Equals(obj as ValueObject);
     }
 
     public override int GetHashCode()
@@ -31,6 +37,11 @@ public abstract class ValueObject : IComparable<ValueObject>
     #endregion
 
     #region Equality operators
+
+    public bool Equals(ValueObject? other) 
+        => other is not null && 
+            GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());
+
     public static bool operator ==(ValueObject? left, ValueObject? right)
     {
         if (ReferenceEquals(left, null) && ReferenceEquals(right, null))

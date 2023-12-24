@@ -29,8 +29,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
             sw.Start();
             var response = await next();
             sw.Stop();
-            var result = (Result<TResponse>)response;
-            result.Match(
+            response.Match(
                 _ => _logger.LogInformation("[{RequestType}] => {Request} executed successfully ({ElapsedMs}ms)",
                     requestType,
                     request,

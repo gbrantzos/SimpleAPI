@@ -28,6 +28,7 @@ public sealed class Result<TData>
     #pragma warning disable CA2225
     public static implicit operator Result<TData>(TData data) => new(data);
     public static implicit operator Result<TData>(Error error) => new(default, error, true);
+    public static implicit operator TData(Result<TData> result) => result.Data;
     #pragma warning restore CA2225
     
     public T Match<T>(Func<TData, T> dataFunc, Func<Error, T> errorFunc)
@@ -61,3 +62,14 @@ public sealed class Result<TData>
             ? _error!
             : throw new InvalidOperationException("Result does not have errors.");
 }
+
+// TODO Result improvements
+// Create methods
+// - Map & MapError, which transforms Data
+// - Bind & BindError, which returns a method that returns a new Result with Data
+// - Tap, to invoke side effects
+// - Ensure, to fail if a condition applies
+// - Finally, to return a value and finish chain
+// 
+// Also create shortcuts for creation
+// Consider having a Result without TData

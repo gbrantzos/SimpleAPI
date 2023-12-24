@@ -1,8 +1,6 @@
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 
 namespace SimpleAPI.Domain.Base;
@@ -34,8 +32,8 @@ public static class SearchCriteria
 {
     private sealed record Condition(string Field, string Operator, string Value);
 
-    private static readonly HashSet<string> KnownOperators = new HashSet<string>
-    {
+    private static readonly HashSet<string> KnownOperators =
+    [
         "eq", // Equals
         "neq", // Not equals
         "lt", // Less than
@@ -46,8 +44,8 @@ public static class SearchCriteria
         "starts", // Starts with
         "ends", // Ends with
         "in", // In
-        "nin" // Not In
-    };
+        "nin"
+    ];
 
     private static readonly MethodInfo StartsWithMethod
         = typeof(string).GetMethod("StartsWith", new[] { typeof(string) }) ??
@@ -210,7 +208,7 @@ public static class SearchCriteria
         var expMember = propertyName == condition.Field
             ? Expression.Property(expParam, prop.Name)
             : GetNestedProperty(expParam, condition.Field);
-        var expValue = Expression.Constant(Cast(expMember.Type, condition.Value));
+        var expValue = Expression.Constant(SafeConvert(condition.Value, expMember.Type));
         Expression expBody = condition.Operator switch
         {
             "eq" => Expression.Equal(expMember, expValue),
@@ -239,26 +237,6 @@ public static class SearchCriteria
         if (conditionValues.Length == 0)
             throw new ArgumentException("Condition value is empty!");
 
-        // TODO Revisit
-        // if (typeof(EntityID).IsAssignableFrom(expMember.Type))
-        // {
-        //     // Due to EF Core shortcomings on using ValueObject as keys we cannot use 'Contains', thus
-        //     // we shall rewrite in as OR clause!
-        //     var expValue = Expression.Constant(
-        //         InstanceFactory.CreateInstance(expMember.Type, Int64.Parse(conditionValues[0])), expMember.Type);
-        //     var expBodyOr = Expression.Equal(expMember, expValue);
-        //     for (var i = 1; i < conditionValues.Length; i++)
-        //     {
-        //         expValue = Expression.Constant(InstanceFactory
-        //             .CreateInstance(expMember.Type, Int64.Parse(conditionValues[i])), expMember.Type);
-        //         expBodyOr = Expression.OrElse(expBodyOr, Expression.Equal(expMember, expValue));
-        //     }
-        //
-        //     return condition.Operator == "nin"
-        //         ? Expression.Lambda<Func<T, bool>>(Expression.Not(expBodyOr), expParam)
-        //         : Expression.Lambda<Func<T, bool>>(expBodyOr, expParam);
-        // }
-
         var containsMethod = typeof(Enumerable)
             .GetMethods()
             .Where(m => m.Name == "Contains")
@@ -273,25 +251,20 @@ public static class SearchCriteria
             : Expression.Lambda<Func<T, bool>>(expBody, expParam);
     }
 
-    private static object SafeConvert(string value, Type type)
+    private static object? SafeConvert(string value, Type type)
     {
-        var converter = TypeDescriptor.GetConverter(type);
-        if (converter.CanConvertFrom(typeof(String)))
-            return (string)converter.ConvertFrom(value)!;
+        if (type.IsAssignableTo(typeof(IConvertible)))
+            return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
+
+        if (type.IsAssignableTo(typeof(IEntityID)))
+            return Activator.CreateInstance(type, Convert.ToInt32(value, CultureInfo.InvariantCulture));
 
         if (type.IsEnum)
             return Enum.Parse(type, value);
-        return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
-    }
-
-    private static object? Cast(this Type type, object value)
-    {
-        if (typeof(IEntityID).IsAssignableFrom(type))
-            return Activator.CreateInstance(type, Convert.ToInt32(value, CultureInfo.InvariantCulture));
         
         var param = Expression.Parameter(typeof(string), "d");
-        var body = Expression.Block(Expression.Convert(Expression.Convert(param, value.GetType()), type));
-
+        var body = Expression.Block(Expression.Convert(param, type));
+        
         var exp = Expression.Lambda(body, param).Compile();
         return exp.DynamicInvoke(value);
     }
