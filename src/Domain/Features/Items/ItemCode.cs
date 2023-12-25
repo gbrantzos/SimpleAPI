@@ -3,7 +3,7 @@ using SimpleAPI.Core.Guards;
 
 namespace SimpleAPI.Domain.Features.Items;
 
-public sealed class ItemCode : ValueObject
+public sealed class ItemCode : ValueObject, IComparable<ItemCode>
 {
     private readonly string _value;
 

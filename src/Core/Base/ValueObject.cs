@@ -4,7 +4,7 @@ namespace SimpleAPI.Core.Base;
 // https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects
 // https://github.com/vkhorikov/CSharpFunctionalExtensions/blob/master/CSharpFunctionalExtensions/ValueObject/ValueObject.cs
 
-public abstract class ValueObject : IComparable<ValueObject>, IEquatable<ValueObject>
+public abstract class ValueObject : IEquatable<ValueObject>, IComparable<ValueObject>, IComparable
 {
     /// <summary>
     /// Get value object members for equality
@@ -34,6 +34,7 @@ public abstract class ValueObject : IComparable<ValueObject>, IEquatable<ValueOb
             .Select(x => x.GetHashCode())
             .Aggregate((x, y) => x ^ y);
     }
+    
     #endregion
 
     #region Equality operators
@@ -82,6 +83,8 @@ public abstract class ValueObject : IComparable<ValueObject>, IEquatable<ValueOb
     public static bool operator <=(ValueObject left, ValueObject right) => left.CompareTo(right) <= 0;
     public static bool operator >(ValueObject left, ValueObject right) => left.CompareTo(right) > 0;
     public static bool operator >=(ValueObject left, ValueObject right) => left.CompareTo(right) >= 0;
+
+    public int CompareTo(object? obj) => this.CompareTo(obj as ValueObject);
 
     #endregion
 }
