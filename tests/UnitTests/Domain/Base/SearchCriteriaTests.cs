@@ -55,4 +55,34 @@ public class SearchCriteriaTests
         actual.Specification.Should().NotBeNull();
         actual.Specification.ToString().Should().BeEquivalentTo("p => (((p.ID > 5) AndAlso (p.Code == ATC-213)) AndAlso (p.Description != \"test\"))");
     }
+
+    [Fact]
+    public void Should_parse_offset_paging()
+    {
+        // Arrange
+        var queryParams = "offset=5&code=ATC-213&limit=20";
+
+        // Act
+        var actual = SearchCriteria.Parse<Item>(queryParams);
+
+        // Assert
+        actual.Paging.Should().NotBeNull();
+        actual.Paging.Should().BeOfType<OffsetBasedPaging>();
+        actual.Paging.Should().BeEquivalentTo(new OffsetBasedPaging() { Offset = 5, Limit = 20 });
+    }
+    
+    [Fact]
+    public void Should_parse_absolute_paging()
+    {
+        // Arrange
+        var queryParams = "page_number=2&code=ATC-213&page_size=20";
+
+        // Act
+        var actual = SearchCriteria.Parse<Item>(queryParams);
+
+        // Assert
+        actual.Paging.Should().NotBeNull();
+        actual.Paging.Should().BeOfType<AbsolutePaging>();
+        actual.Paging.Should().BeEquivalentTo(new AbsolutePaging() { PageNumber = 2, PageSize = 20 });
+    }
 }

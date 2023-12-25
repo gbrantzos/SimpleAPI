@@ -366,11 +366,16 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
                 sorting: new[] { new Sorting<Item>(i => i.Code, Sorting.SortDirection.Descending) }
             );
 
+            var pagedSearch = new SearchCriteria<Item>(paging: new OffsetBasedPaging() { Offset = 2, Limit = 3 });
+            
             // Act 
             var actual = await repository.FindAsync(searchCriteria);
-
+            var pagedResult = await repository.FindAsync(pagedSearch);
+            
             // Assert
             actual.Should().NotBeNull();
+            pagedResult.Should().NotBeNull();
+            pagedResult.Count.Should().Be(3);
         });
     }
 }

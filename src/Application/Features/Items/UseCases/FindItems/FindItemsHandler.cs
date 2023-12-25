@@ -25,6 +25,9 @@ public class FindItemsHandler : Handler<FindItemsQuery, FindItemsResult>
         var items = results
             .Select(i => i.ToViewModel())
             .ToList();
-        return new FindItemsResult(items);
+        var result = criteria.IsPaged
+            ? new FindItemsResult(items, await _repository.CountAsync(criteria.Specification, cancellationToken))
+            : new FindItemsResult(items);
+        return result;
     }
 }

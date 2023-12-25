@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -11,16 +12,22 @@ public class SearchCriteria<T>
     public IEnumerable<string> Include { get; }
     public IEnumerable<Sorting<T>> Sorting { get; }
     public bool ForUpdate { get; }
+    public Paging? Paging { get; }
+
+    [MemberNotNullWhen(true, nameof(Paging))]
+    public bool IsPaged => Paging != null;
 
     public SearchCriteria(Specification<T>? specification = null,
         IEnumerable<string>? include = null,
         IEnumerable<Sorting<T>>? sorting = null,
-        bool forUpdate = false)
+        bool forUpdate = false,
+        Paging? paging = null)
     {
-        ForUpdate     = forUpdate;
         Specification = specification ?? Specification<T>.True;
         Include       = include ?? Enumerable.Empty<string>();
         Sorting       = sorting ?? Enumerable.Empty<Sorting<T>>();
+        ForUpdate     = forUpdate;
+        Paging        = paging;
     }
 }
 
@@ -69,7 +76,9 @@ public static class SearchCriteria
         var specs = new SearchCriteria<T>(
             specification: ExtractSpecification<T>(tokens),
             include: ExtractIncludes<T>(tokens),
-            sorting: ExtractSorting<T>(tokens)
+            sorting: ExtractSorting<T>(tokens),
+            forUpdate: false,
+            paging: ExtractPaging(tokens)
         );
         return specs;
     }
@@ -186,6 +195,28 @@ public static class SearchCriteria
             : Specification.CombineAnd(specifications.ToArray());
     }
 
+    private static Paging? ExtractPaging(List<KeyValuePair<string, string>> tokens)
+    {
+        var offset = Convert.ToInt32(tokens.FirstOrDefault(t => t.Key.Equals("offset", StringComparison.OrdinalIgnoreCase)).Value,
+            CultureInfo.InvariantCulture);
+        var limit = Convert.ToInt32(tokens.FirstOrDefault(t => t.Key.Equals("limit", StringComparison.OrdinalIgnoreCase)).Value,
+            CultureInfo.InvariantCulture);
+        var pageNumber =
+            Convert.ToInt32(tokens.FirstOrDefault(t => t.Key.Equals("page_number", StringComparison.OrdinalIgnoreCase)).Value,
+                CultureInfo.InvariantCulture);
+        var pageSize =
+            Convert.ToInt32(tokens.FirstOrDefault(t => t.Key.Equals("page_size", StringComparison.OrdinalIgnoreCase)).Value,
+                CultureInfo.InvariantCulture);
+
+        if (offset is > 0 && limit is > 0)
+            return new OffsetBasedPaging() { Offset = offset, Limit = limit };
+
+        if (pageNumber is > 0 && pageSize is > 0)
+            return new AbsolutePaging() { PageNumber = pageNumber, PageSize = pageSize };
+
+        return null;
+    }
+
     private static Expression GetNestedProperty(ParameterExpression param, string propertyName)
     {
         // TODO We should support nested collections
@@ -257,10 +288,10 @@ public static class SearchCriteria
 
         if (type.IsEnum)
             return Enum.Parse(type, value);
-        
+
         var param = Expression.Parameter(typeof(string), "d");
         var body = Expression.Block(Expression.Convert(param, type));
-        
+
         var exp = Expression.Lambda(body, param).Compile();
         return exp.DynamicInvoke(value);
     }

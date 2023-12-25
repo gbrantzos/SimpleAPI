@@ -57,11 +57,21 @@ public abstract class BaseRepository<TEntity, TEntityID> : IRepository<TEntity, 
         var dbSet = DbSetWithDetails(Context.Set<TEntity>(), criteria.Include);
         var query = dbSet.Where(criteria.Specification.Expression);
         var sortedQuery = AddSorting(query, criteria.Sorting);
-        var finalQuery = sortedQuery.TagWith($"{RepositoryName} :: {nameof(FindAsync)}");
-            
+        var finalQuery = (
+            criteria.IsPaged
+                ? AddRowBounds(sortedQuery, criteria.Paging)
+                : sortedQuery
+        ).TagWith($"{RepositoryName} :: {nameof(FindAsync)}");
+
         return criteria.ForUpdate
             ? await finalQuery.ToListAsync(cancellationToken)
             : await finalQuery.AsNoTracking().ToListAsync(cancellationToken);
+
+        IQueryable<TEntity> AddRowBounds(IQueryable<TEntity> queryable, Paging criteriaPaging)
+        {
+            var rowBounds = criteriaPaging.GetRowBounds();
+            return queryable.Skip(rowBounds.First -1).Take(rowBounds.Total);
+        }
     }
 
     private static IQueryable<TEntity> DbSetWithDetails(IQueryable<TEntity> query, IEnumerable<string> details)
