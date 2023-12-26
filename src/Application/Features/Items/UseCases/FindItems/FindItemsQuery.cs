@@ -8,6 +8,5 @@ public record FindItemsQuery(string QueryParams) : Query<FindItemsResult>;
 
 public class FindItemsResult : QueryResult<ItemViewModel>
 {
-    public FindItemsResult(IReadOnlyList<ItemViewModel> items) : base(items) { }
-    public FindItemsResult(IReadOnlyList<ItemViewModel> items, int totalRows) : base(items, totalRows) { }
+    public FindItemsResult(IReadOnlyList<ItemViewModel> items, int totalRows = 0) : base(items, totalRows) { }
 }
