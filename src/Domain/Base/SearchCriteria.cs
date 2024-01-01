@@ -6,6 +6,10 @@ using System.Text.RegularExpressions;
 
 namespace SimpleAPI.Domain.Base;
 
+// Check this for nested properties searching
+// https://github.com/dbelmont/ExpressionBuilder
+// https://www.codeproject.com/Articles/1079028/Build-Lambda-Expressions-Dynamically
+
 public class SearchCriteria<T>
 {
     public Specification<T> Specification { get; }
@@ -184,6 +188,32 @@ public static class SearchCriteria
             if (!KnownOperators.Contains(condition.Operator))
                 throw new ArgumentException($"Unsupported operator: {condition.Operator}");
 
+            // TODO We should support nested collections
+            // if (propertyName.StartsWith("alternativeCodes", StringComparison.OrdinalIgnoreCase))
+            // {
+            //     var nestedType = prop.PropertyType.GetGenericArguments()[0];
+            //     var nestedParam = Expression.Parameter(nestedType, "n");
+            //     var nestedMember = Expression.PropertyOrField(nestedParam, "Code");
+            //     var nestedValue = SafeConvert(condition.Value, nestedMember.Type);
+            //     var nestedBody = Expression.GreaterThan(nestedMember, Expression.Constant(nestedValue));
+            //
+            //     var nestedLambda = Expression.Lambda(nestedBody, nestedParam);
+            //
+            //     var anyInfo = typeof(Enumerable)
+            //         .GetMethods(BindingFlags.Static | BindingFlags.Public)
+            //         .First(m => m.Name == "Any" && m.GetParameters().Length == 2);
+            //     anyInfo = anyInfo.MakeGenericMethod(nestedType);
+            //
+            //     var nestedCall = Expression.Call(
+            //         anyInfo,
+            //         Expression.PropertyOrField(Expression.Parameter(typeof(T), "p"), "AlternativeCodes"),
+            //         nestedLambda);
+            //
+            //     var nestedExpression = Expression.Lambda<Func<T, bool>>(nestedCall, Expression.Parameter(typeof(T), "p"));
+            //     specifications.Add(new Specification<T>(nestedExpression));
+            //     continue;
+            // }
+            
             var result = condition.Operator is "in" or "nin"
                 ? MultiExpressionForCondition<T>(condition, prop)
                 : SingleExpressionForCondition<T>(condition, prop);
@@ -219,7 +249,6 @@ public static class SearchCriteria
 
     private static Expression GetNestedProperty(ParameterExpression param, string propertyName)
     {
-        // TODO We should support nested collections
         Expression toReturn = param;
         foreach (var member in propertyName.Split('.'))
         {

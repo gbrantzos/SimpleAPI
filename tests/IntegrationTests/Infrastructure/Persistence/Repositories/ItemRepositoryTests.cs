@@ -367,10 +367,15 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             );
 
             var pagedSearch = new SearchCriteria<Item>(paging: new OffsetBasedPaging() { Offset = 2, Limit = 3 });
+
+            var nested = new SearchCriteria<Item>(
+                specification: new Specification<Item>(p => p.AlternativeCodes.Any(n => n.Code == (ItemCode)"CODE.001"))
+            );
             
             // Act 
             var actual = await repository.FindAsync(searchCriteria);
             var pagedResult = await repository.FindAsync(pagedSearch);
+            var nestedResults = await repository.FindAsync(nested);
             
             // Assert
             actual.Should().NotBeNull();
