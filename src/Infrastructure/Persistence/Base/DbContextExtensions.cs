@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace SimpleAPI.Infrastructure.Persistence.Base;
 
-public static class DbContextModelExtensions
+public static class DbContextExtensions
 {
     public static ReferenceCollectionBuilder<TEntity, TRelatedEntity> HasRelatedTableIndexName<TEntity, TRelatedEntity>(
         this ReferenceCollectionBuilder<TEntity, TRelatedEntity> referenceCollectionBuilder, string name)
