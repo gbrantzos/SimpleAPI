@@ -71,7 +71,7 @@ public class SimpleAPIFactory : WebApplicationFactory<Program>
             .UseSqlite(_connection)
             .Options;
 
-        return new SimpleAPIContext(options, new SystemTimeProvider());
+        return new SimpleAPIContext(options, TimeProvider.System);
     }
 
     protected override void Dispose(bool disposing)

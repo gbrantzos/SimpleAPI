@@ -171,7 +171,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
         {
             var item = Item.Create("Test.032", "Testing item persistence");
             var dt1 = DateTime.Now;
-            _database.TimeProviderMock.Setup(m => m.GetNow()).Returns(dt1);
+            _database.FakeTimeProvider.SetUtcNow(dt1);
 
             repository.Add(item);
             await uow.SaveChangesAsync();
@@ -182,7 +182,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             _database.Context.Entry(existingItem).Property(SimpleAPIContext.CreatedAt).CurrentValue.Should().Be(dt1);
 
             var dt2 = DateTime.Now;
-            _database.TimeProviderMock.Setup(m => m.GetNow()).Returns(dt2);
+            _database.FakeTimeProvider.SetUtcNow(dt2);
 
             existingItem.Description = "ChangedDescription";
             await uow.SaveChangesAsync();
@@ -316,7 +316,7 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
             _database.Context.ChangeTracker.Clear();
 
             var dt1 = DateTime.Now;
-            _database.TimeProviderMock.Setup(m => m.GetNow()).Returns(dt1);
+            _database.FakeTimeProvider.SetUtcNow(dt1);
 
             // Act
             repository.Delete(item);

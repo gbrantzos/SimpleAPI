@@ -2,6 +2,7 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using SimpleAPI.Application.Common;
 using SimpleAPI.Infrastructure.Persistence;
@@ -12,7 +13,7 @@ namespace SimpleAPI.IntegrationTests.Setup;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class DatabaseFixture : IAsyncLifetime
 {
-    private readonly Mock<ITimeProvider> _timeProviderMock = new Mock<ITimeProvider>();
+    private readonly FakeTimeProvider _fakeTimeProvider = new ();
     private readonly IContainer? _container;
     private SimpleAPIContext? _context;
     private string? _connectionString;
@@ -23,7 +24,7 @@ public class DatabaseFixture : IAsyncLifetime
     public string ConnectionString => _connectionString ??
         throw new InvalidOperationException($"{nameof(DatabaseFixture)} not initialized");
 
-    public Mock<ITimeProvider> TimeProviderMock => _timeProviderMock;
+    public FakeTimeProvider FakeTimeProvider => _fakeTimeProvider;
 
     public DatabaseFixture()
     {
@@ -57,7 +58,7 @@ public class DatabaseFixture : IAsyncLifetime
             .EnableSensitiveDataLogging()
             .EnableDetailedErrors()
             .Options;
-        _context = new SimpleAPIContext(options, _timeProviderMock.Object);
+        _context = new SimpleAPIContext(options, _fakeTimeProvider);
         _context.Database.EnsureCreated();
     }
 

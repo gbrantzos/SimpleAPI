@@ -33,7 +33,7 @@ public class BuildInformation
         using var reader = new StreamReader(buildData);
         var text = reader.ReadToEnd().Trim();
         var infoParts = text.Split(new char[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
-        if (infoParts!.Length < 3)
+        if (infoParts.Length < 3)
             throw new ArgumentException("Invalid build information.");
 
         var tags = infoParts[2][(infoParts[2].IndexOf(":", StringComparison.CurrentCultureIgnoreCase) + 1)..]

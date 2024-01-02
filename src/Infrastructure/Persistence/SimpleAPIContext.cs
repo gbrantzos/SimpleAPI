@@ -8,7 +8,7 @@ namespace SimpleAPI.Infrastructure.Persistence;
 
 public class SimpleAPIContext : DbContext
 {
-    private readonly ITimeProvider _timeProvider;
+    private readonly TimeProvider _timeProvider;
 
     // Common columns
     public const string ID = "id";
@@ -20,7 +20,7 @@ public class SimpleAPIContext : DbContext
 
     public DbSet<Item> Items => Set<Item>();
 
-    public SimpleAPIContext(DbContextOptions<SimpleAPIContext> options, ITimeProvider timeProvider) : base(options)
+    public SimpleAPIContext(DbContextOptions<SimpleAPIContext> options, TimeProvider timeProvider) : base(options)
     {
         _timeProvider = timeProvider;
     }
@@ -83,12 +83,12 @@ public class SimpleAPIContext : DbContext
         {
             // Change created and updated timestamps
             if (entry.State == EntityState.Added)
-                entry.Property(CreatedAt).CurrentValue = _timeProvider.GetNow();
+                entry.Property(CreatedAt).CurrentValue = _timeProvider.GetLocalNow().DateTime;
             if (entry.State == EntityState.Modified)
             {
                 if (entry.Entity is ISoftDelete && entry.Property<bool>(IsDeleted).CurrentValue)
                     continue;
-                entry.Property(ModifiedAt).CurrentValue = _timeProvider.GetNow();
+                entry.Property(ModifiedAt).CurrentValue = _timeProvider.GetLocalNow().DateTime;
             }
         }
     }
@@ -100,7 +100,7 @@ public class SimpleAPIContext : DbContext
             .Where(e => e.Property<bool>(IsDeleted).CurrentValue);
         foreach (var entry in softDeleted)
         {
-            entry.Property(DeletedAt).CurrentValue = _timeProvider.GetNow();
+            entry.Property(DeletedAt).CurrentValue = _timeProvider.GetLocalNow().DateTime;
         }
     }
 
