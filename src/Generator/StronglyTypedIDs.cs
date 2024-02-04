@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using System.Globalization;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -6,54 +6,64 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace SimpleAPI.Generator;
 
-// Ideas on https://www.meziantou.net/strongly-typed-ids-with-csharp-source-generators.htm
+public readonly record struct TypedDetails(string Name, string Namespace)
+{
+    public readonly string Name = Name;
+    public readonly string Namespace = Namespace;
+};
 
 [Generator(LanguageNames.CSharp)]
 public class StronglyTypedIDs : IIncrementalGenerator
 {
+    public const string AttributeName = "StronglyTypedIDAttribute";
+    public const string AttributeCode =
+        $$$"""
+           namespace SimpleAPI.Core
+           {
+               [System.AttributeUsage(System.AttributeTargets.Class)]
+               public class {{{AttributeName}}} : System.Attribute { }
+           }
+           """;
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
             "SimpleAPI.Generator.Common.g.cs",
-            SourceText.From(Helpers.StronglyTypeAttributeNameCode, Encoding.UTF8)));
+            SourceText.From(AttributeCode, Encoding.UTF8)));
 
-        var entityTypes = context.SyntaxProvider.CreateSyntaxProvider(
-            predicate: (node, _) => IsNodeTargetForGeneration(node),
-            transform: (syntaxContext, token) => (ClassDeclarationSyntax)syntaxContext.Node
-        );
+        var entityTypes = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                $"SimpleAPI.Core.{AttributeName}",
+                predicate: (node, _) => node is ClassDeclarationSyntax,
+                transform: GetTypeDetails
+            )
+            .Where(static m => m is not null);
 
-        var compilation = context.CompilationProvider.Combine(entityTypes.Collect());
-        context.RegisterSourceOutput(compilation, (productionContext, syntax)
-            => Execute(productionContext, syntax.Left, syntax.Right));
+        context.RegisterSourceOutput(entityTypes, Execute);
     }
 
-    private static bool IsNodeTargetForGeneration(SyntaxNode syntaxNode)
-        => syntaxNode is ClassDeclarationSyntax { AttributeLists.Count: > 0 } classDeclarationSyntax &&
-            classDeclarationSyntax.AttributeLists
-                .Any(al => al
-                    .Attributes
-                    .Any(a => a.Name.ToString() == Helpers.StronglyTypeAttributeName ||
-                        a.Name.ToString() == (Helpers.StronglyTypeAttributeName + "Attribute")));
-
-    private static void Execute(SourceProductionContext context,
-        Compilation compilation,
-        ImmutableArray<ClassDeclarationSyntax> typesList)
+    private static void Execute(SourceProductionContext context, TypedDetails? details)
     {
-        foreach (var syntax in typesList)
-        {
-            var model = compilation.GetSemanticModel(syntax.SyntaxTree);
-            var symbol = model.GetDeclaredSymbol(syntax);
-            if (symbol is null)
-                continue;
+        // Safety...
+        if (details is not { } dt) return;
 
-            var symbolName = symbol.Name;
-            var symbolNamespace = symbol.ContainingNamespace;
-            var stronglyTypedID = PrepareStronglyTypedID(symbolName, symbolNamespace.ToString());
-            context.AddSource($"SimpleAPI.{symbolName}.TypedID.g.cs", stronglyTypedID);
-        }
+        var stronglyTypedID = PrepareCode(dt.Name, dt.Namespace);
+        context.AddSource($"SimpleAPI.Generator.{dt.Name}.StronglyTypedID.g.cs", stronglyTypedID);
     }
 
-    private static string PrepareStronglyTypedID(string symbolName, string symbolNamespace)
+    private static TypedDetails? GetTypeDetails(GeneratorAttributeSyntaxContext context,
+        CancellationToken token)
+    {
+        // Safety
+        if (context.TargetSymbol is not INamedTypeSymbol classSymbol) return null;
+        token.ThrowIfCancellationRequested();
+
+        var symbolName = classSymbol.Name;
+        var symbolNamespace = classSymbol.ContainingNamespace.ToString();
+        return new TypedDetails(symbolName, symbolNamespace);
+    }
+
+    private static string PrepareCode(string symbolName, string symbolNamespace)
     {
         // https://andrewlock.net/strongly-typed-id-updates/
         return $$"""
@@ -63,6 +73,8 @@ public class StronglyTypedIDs : IIncrementalGenerator
                  //
                  //     Changes to this file may cause incorrect behavior and will be lost if
                  //     the code is regenerated.
+                 //
+                 //     Created at: {{DateTime.UtcNow.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture)}}
                  // </auto-generated>
                  //------------------------------------------------------------------------------
                  #nullable enable

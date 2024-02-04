@@ -168,3 +168,5 @@ dotnet_diagnostic.CA1861.severity = none
 
 # We like marker interfaces! :)
 dotnet_diagnostic.CA1040.severity = none
+
+dotnet_code_quality.ca1051.exclude_structs = true
