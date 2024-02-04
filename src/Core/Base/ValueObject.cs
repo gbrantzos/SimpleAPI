@@ -22,10 +22,7 @@ public abstract class ValueObject : IEquatable<ValueObject>, IComparable<ValueOb
         if (ReferenceEquals(obj, this))
             return true;
         
-        if (obj.GetType() != GetType())
-            return false;
-
-        return this.Equals(obj as ValueObject);
+        return obj.GetType() == GetType() && this.Equals(obj as ValueObject);
     }
 
     public override int GetHashCode()
